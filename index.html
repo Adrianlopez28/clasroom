@@ -6,751 +6,826 @@
     <title>La Escalera del Saber - Comprensión Lectora</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
-        :root { 
-            --primary: #2563eb; 
-            --bg-main: #0f172a; 
-            --card-bg: #ffffff; 
-            --text-dark: #0f172a; 
-            --text-muted: #64748b;
-            --border-light: #e2e8f0;
-            
-            /* Temas por Nivel */
-            --literal-color: #059669;
-            --literal-bg: #ecfdf5;
-            --literal-border: #a7f3d0;
-
-            --inferencial-color: #2563eb;
-            --inferencial-bg: #eff6ff;
-            --inferencial-border: #bfdbfe;
-
-            --critico-color: #7c3aed;
-            --critico-bg: #faf5ff;
-            --critico-border: #e9d5ff;
-
-            /* Nivel activo por defecto */
-            --current-theme: var(--literal-color);
-            --current-bg: var(--literal-bg);
-            --current-border: var(--literal-border);
+        :root {
+            --bg-dark: #07132b;
+            --blue-main: #0066ff;
+            --blue-dark: #003399;
+            --blue-card-bg: rgba(7, 24, 56, 0.85);
+            --border-glow: #1a5fff;
+            --text-white: #ffffff;
+            --text-muted: #94a3b8;
         }
 
-        body { 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
-            background: var(--bg-main); 
-            color: #f8fafc; 
-            margin: 0; 
-            padding: 20px; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
             min-height: 100vh;
-            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
         }
 
-        .container { 
-            width: 100%; 
-            max-width: 820px; 
-            background: #1e293b; 
-            padding: 30px; 
-            border-radius: 20px; 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
-            border: 2px solid #334155; 
-            box-sizing: border-box; 
+        /* --- BARRA SUPERIOR (HEADER HUD) --- */
+        header {
+            background: rgba(3, 12, 34, 0.95);
+            padding: 12px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(0, 102, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            z-index: 10;
         }
 
-        h1 { 
-            color: #38bdf8; 
-            text-align: center; 
-            font-size: 1.8rem; 
-            margin: 0 0 5px 0; 
-            font-weight: 800;
-        }
-        
-        .subtitle { 
-            text-align: center; 
-            color: #94a3b8; 
-            margin-bottom: 20px; 
-            font-size: 0.95rem; 
-        }
-
-        /* Marcador HUD */
-        .hud-bar { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            background: #0f172a; 
-            padding: 12px 20px; 
-            border-radius: 12px; 
-            margin-bottom: 15px; 
-            border: 1px solid #334155; 
-        }
-        
-        .hud-user { font-weight: 700; color: #f8fafc; font-size: 1.05rem; }
-        .hud-stats { display: flex; gap: 15px; align-items: center; }
-        .hud-score { color: #f59e0b; font-weight: 800; font-size: 1.1rem; }
-        .hud-stars { font-size: 1.2rem; }
-
-        /* Canvas Escenario */
-        .game-canvas-container { 
-            width: 100%; 
-            height: 200px; 
-            background: #020617; 
-            border-radius: 12px; 
-            margin-bottom: 20px; 
-            border: 3px solid var(--current-theme); 
-            transition: border-color 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        canvas { width: 100%; height: 100%; display: block; }
-
-        .step-box { display: none; }
-        .step-box.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-
-        .context-box { 
-            background: #0f172a; 
-            padding: 18px; 
-            border-left: 5px solid var(--current-theme); 
-            border-radius: 8px; 
-            margin-bottom: 20px; 
-            font-size: 0.98rem; 
-            line-height: 1.6; 
-            color: #e2e8f0; 
-            transition: border-color 0.4s ease;
-        }
-
-        /* Tarjeta de Pregunta con colores por nivel */
-        .question-card { 
-            padding: 24px; 
-            border-radius: 14px; 
-            margin-bottom: 20px; 
-            background-color: var(--current-bg); 
-            border: 2px solid var(--current-border); 
-            transition: all 0.4s ease;
-        }
-
-        .badge-nivel { 
-            display: inline-block; 
-            padding: 6px 12px; 
-            border-radius: 20px; 
-            font-size: 0.8rem; 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            margin-bottom: 12px; 
-            color: #ffffff; 
-            background-color: var(--current-theme);
-            transition: background-color 0.4s ease;
-        }
-
-        .question-title { 
-            font-size: 1.1rem; 
-            font-weight: 700; 
-            margin-bottom: 18px; 
-            color: var(--text-dark); 
-            line-height: 1.4;
-        }
-
-        .options label { 
+        .logo-area {
             display: flex;
             align-items: center;
-            margin: 10px 0; 
-            padding: 14px 18px; 
-            background: #ffffff; 
-            border: 2px solid var(--border-light); 
-            border-radius: 10px; 
-            cursor: pointer; 
-            transition: all 0.2s ease; 
-            font-size: 0.95rem; 
-            color: var(--text-dark); 
-            font-weight: 500;
+            gap: 12px;
         }
 
-        .options label:hover { 
-            border-color: var(--current-theme); 
-            background: #f8fafc; 
-            transform: translateX(4px);
+        .logo-icon {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 0 8px #38bdf8);
         }
 
-        .options input { margin-right: 12px; transform: scale(1.2); }
-
-        input[type="text"] { 
-            width: 100%; 
-            padding: 14px; 
-            margin-top: 8px; 
-            margin-bottom: 20px; 
-            background: #0f172a; 
-            border: 2px solid #475569; 
-            color: #ffffff; 
-            border-radius: 10px; 
-            box-sizing: border-box; 
-            font-size: 1rem; 
+        .logo-text h1 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #ffffff;
         }
 
-        button { 
-            background: var(--current-theme); 
-            color: #ffffff; 
-            border: none; 
-            padding: 16px 20px; 
-            font-size: 1.05rem; 
-            border-radius: 10px; 
-            cursor: pointer; 
-            width: 100%; 
-            font-weight: 700; 
-            transition: all 0.2s ease; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        .logo-text h1 span {
+            color: #f59e0b;
         }
 
-        button:hover { filter: brightness(1.15); transform: translateY(-2px); }
-
-        /* Modal Overlay */
-        .feedback-overlay { 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(15, 23, 42, 0.85); 
-            display: none; 
-            justify-content: center; 
-            align-items: center; 
-            z-index: 1000; 
+        .logo-text p {
+            font-size: 0.85rem;
+            color: #94a3b8;
+            letter-spacing: 1px;
         }
 
-        .feedback-content { 
-            background: #1e293b; 
-            color: white; 
-            padding: 35px; 
-            border-radius: 20px; 
-            text-align: center; 
-            max-width: 400px; 
-            width: 90%; 
-            border: 2px solid #334155; 
+        .hud-pills {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        .feedback-emoji { font-size: 4.5rem; margin-bottom: 10px; }
-        .feedback-text { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; color: #38bdf8; }
-        .feedback-sub { font-size: 1rem; color: #94a3b8; }
+        .pill {
+            background: rgba(15, 30, 66, 0.9);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            border-radius: 30px;
+            padding: 6px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: inset 0 0 10px rgba(0, 102, 255, 0.2);
+        }
 
-        .badge-container { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
-        .badge { background: #0f172a; color: #38bdf8; padding: 14px 24px; border-radius: 14px; font-weight: 700; font-size: 1.1rem; border: 2px solid #f59e0b; box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        .pill-icon { font-size: 1.2rem; }
+        .pill-label { font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; display: block; }
+        .pill-value { font-size: 1.1rem; font-weight: 800; color: #ffffff; }
+
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(15, 30, 66, 0.9);
+            padding: 4px 15px 4px 5px;
+            border-radius: 30px;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .avatar-img {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: #38bdf8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .avatar-speech {
+            font-size: 0.85rem;
+            font-style: italic;
+            color: #38bdf8;
+            font-weight: 600;
+        }
+
+        /* --- CONTENEDOR PRINCIPAL DEL JUEGO --- */
+        .game-viewport {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 30px 5%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 580px;
+        }
+
+        /* Registro Modal / Contenedor */
+        .modal-register {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(7, 24, 56, 0.95);
+            border: 2px solid var(--border-glow);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.5);
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+            z-index: 100;
+        }
+
+        .modal-register h2 { margin-bottom: 15px; color: #38bdf8; }
+        .modal-register input {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid #334155;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        /* --- TARJETA DE PREGUNTA DERECHA --- */
+        .question-container {
+            width: 100%;
+            max-width: 620px;
+            background: var(--blue-card-bg);
+            border: 2px solid rgba(0, 102, 255, 0.6);
+            border-radius: 24px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 102, 255, 0.2);
+            overflow: hidden;
+            display: none; /* Se activa al iniciar */
+            animation: slideIn 0.4s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            background: rgba(0, 51, 153, 0.4);
+            border-bottom: 1px solid rgba(0, 102, 255, 0.3);
+        }
+
+        .level-badge {
+            background: linear-gradient(135deg, #0066ff, #003399);
+            padding: 6px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 50%;
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 10px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #0066ff);
+            width: 10%;
+            transition: width 0.3s ease;
+        }
+
+        .card-body {
+            padding: 25px;
+            background: #ffffff;
+            color: #0f172a;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+
+        .topic-pill {
+            display: inline-block;
+            background: #0066ff;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+        }
+
+        .question-title {
+            font-size: 1.15rem;
+            font-weight: 800;
+            line-height: 1.5;
+            color: #0f172a;
+            margin-bottom: 20px;
+        }
+
+        /* OPCIONES DE RESPUESTA */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .option-item:hover {
+            border-color: #0066ff;
+            background: #f0f7ff;
+            transform: translateX(3px);
+        }
+
+        .option-item.selected {
+            background: #e0f2fe;
+            border-color: #0284c7;
+        }
+
+        .option-letter {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #0066ff;
+            color: white;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 14px;
+            flex-shrink: 0;
+            font-size: 0.95rem;
+        }
+
+        .option-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #1e293b;
+            flex: 1;
+        }
+
+        .option-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #0284c7;
+            color: white;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .option-item.selected .option-check {
+            display: flex;
+        }
+
+        .card-footer {
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(7, 24, 56, 0.9);
+        }
+
+        .motivation-text {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #cbd5e1;
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, #0066ff, #0044cc);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 30px;
+            font-size: 1.05rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-next:hover {
+            transform: scale(1.05);
+            filter: brightness(1.15);
+        }
+
+        /* --- FOOTER INFORMATIVO --- */
+        footer {
+            background: rgba(3, 12, 34, 0.95);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 102, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-icon {
+            font-size: 1.5rem;
+            color: #38bdf8;
+        }
+
+        .footer-info h4 {
+            font-size: 0.9rem;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .footer-info p {
+            font-size: 0.75rem;
+            color: #94a3b8;
+        }
+
+        /* MODAL FINAL RESULTADOS */
+        .modal-success {
+            display: none;
+            background: rgba(7, 24, 56, 0.95);
+            border: 2px solid var(--border-glow);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            margin: auto;
+            box-shadow: 0 0 40px rgba(0, 102, 255, 0.6);
+        }
+
+        .badge-result {
+            background: rgba(15, 30, 66, 0.9);
+            border: 2px solid #f59e0b;
+            color: #fbbf24;
+            padding: 15px 20px;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            margin: 20px 0;
+            display: inline-block;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>La Escalera del Saber</h1>
-    <p class="subtitle">Asciende peldaño a peldaño en la ruta de comprensión lectora</p>
-
-    <!-- Marcador de estado -->
-    <div id="hud-bar" class="hud-bar" style="display: none;">
-        <div class="hud-user">🎒 <span id="hud-name">Estudiante</span></div>
-        <div class="hud-stats">
-            <span id="hud-stars" class="hud-stars">⭐</span>
-            <span id="hud-score" class="hud-score">0 / 100 pts</span>
-        </div>
-    </div>
-
-    <!-- Escenario 2D Retro -->
-    <div id="canvas-container" class="game-canvas-container" style="display: none;">
-        <canvas id="gameCanvas" width="760" height="200"></canvas>
-    </div>
-
-    <!-- PASO 0: REGISTRO -->
-    <div id="step-0" class="step-box active">
-        <div class="context-box" style="text-align: center;">
-            <span style="font-size: 3rem;">🌴🎒</span><br><br>
-            ¡Bienvenido! Ingresa tu nombre completo para iniciar tu ascenso en la Escalera del Saber.
-        </div>
-        <label for="student-name"><b>Nombre Completo del Estudiante:</b></label>
-        <input type="text" id="student-name" required placeholder="Ej. Luis Mario Epieyu">
-        <button onclick="iniciarEvaluacion()">¡Iniciar Escalada! 🚀</button>
-    </div>
-
-    <!-- PREGUNTA 1 (LITERAL) -->
-    <div id="step-1" class="step-box">
-        <div class="context-box">
-            <b>Texto 1: El ciclo de la vida (Biología)</b><br>
-            Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente y comienzan a desarrollar pulmones. Finalmente, emergen a la tierra como ranas adultas, listas para explorar un mundo nuevo fuera del agua.
-        </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Literal - Escalón 1</span>
-            <div class="question-title">1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *</div>
-            <div class="options">
-                <label><input type="radio" name="q1" value="Comienzan a caminar sobre el agua"> Comienzan a caminar sobre el agua.</label>
-                <label><input type="radio" name="q1" value="Sus pulmones desaparecen"> Sus pulmones desaparecen.</label>
-                <label><input type="radio" name="q1" value="El método de respiración y su anatomía física" data-correct="true"> El método de respiración y su anatomía física.</label>
-                <label><input type="radio" name="q1" value="Su dieta se vuelve exclusivamente acuática"> Su dieta se vuelve exclusivamente acuática.</label>
+    <!-- BARRA SUPERIOR HUD -->
+    <header>
+        <div class="logo-area">
+            <div class="logo-icon">📖</div>
+            <div class="logo-text">
+                <h1>La Escalera del <span>Saber</span></h1>
+                <p>Lee · Piensa · Avanza</p>
             </div>
         </div>
-        <button onclick="procesarRespuesta(1, 'literal')">Subir al Siguiente Escalón ➔</button>
-    </div>
 
-    <!-- PREGUNTA 2 (INFERENCIAL) -->
-    <div id="step-2" class="step-box">
-        <div class="context-box">
-            <b>Texto 1: El ciclo de la vida (Biología)</b> (Continuación)
-        </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Inferencial - Escalón 2</span>
-            <div class="question-title">2. ¿Qué se puede deducir sobre el entorno de vida de las ranas? *</div>
-            <div class="options">
-                <label><input type="radio" name="q2" value="Solo pueden vivir en entornos húmedos debido a su piel"> Solo pueden vivir en entornos húmedos debido a su piel.</label>
-                <label><input type="radio" name="q2" value="Son animales que necesitan adaptarse a dos medios distintos durante su vida" data-correct="true"> Son animales que necesitan adaptarse a dos medios distintos durante su vida.</label>
-                <label><input type="radio" name="q2" value="Los renacuajos son más rápidos que las ranas adultas"> Los renacuajos son más rápidos que las ranas adultas.</label>
-                <label><input type="radio" name="q2" value="La metamorfosis ocurre solo en climas fríos"> La metamorfosis ocurre solo en climas fríos.</label>
+        <div class="hud-pills">
+            <div class="pill">
+                <span class="pill-icon">❤️</span>
+                <div>
+                    <span class="pill-label">Vidas</span>
+                    <span class="pill-value" id="hud-lives">3</span>
+                </div>
+            </div>
+
+            <div class="pill">
+                <span class="pill-icon">⭐</span>
+                <div>
+                    <span class="pill-label">Puntos</span>
+                    <span class="pill-value" id="hud-score">0</span>
+                </div>
+            </div>
+
+            <div class="pill">
+                <span class="pill-icon">🛡️</span>
+                <div>
+                    <span class="pill-label">Nivel</span>
+                    <span class="pill-value" id="hud-level">1/10</span>
+                </div>
+            </div>
+
+            <div class="user-avatar">
+                <div class="avatar-img">👦</div>
+                <span class="avatar-speech">¡Tú puedes!</span>
             </div>
         </div>
-        <button onclick="procesarRespuesta(2, 'inferencial')">Subir al Siguiente Escalón ➔</button>
-    </div>
+    </header>
 
-    <!-- PREGUNTA 3 (LITERAL) -->
-    <div id="step-3" class="step-box">
-        <div class="context-box">
-            <b>Texto 2: El Nilo y Egipto (Historia)</b><br>
-            El Antiguo Egipto no habría sido la civilización esplendorosa que conocemos sin el río Nilo. Cada año, el río se desbordaba, cubriendo las tierras circundantes con un lodo fértil que permitía el cultivo de trigo y cebada. Los egipcios aprendieron a controlar estas crecidas mediante canales de riego, lo que les permitió tener excedentes de comida, tiempo para construir pirámides y desarrollar una sociedad compleja.
+    <!-- ESCENARIO CON FONDO -->
+    <main class="game-viewport" id="viewport" style="background-image: url('image_cda8bc.png');">
+
+        <!-- REGISTRO DE ESTUDIANTE -->
+        <div class="modal-register" id="modal-register">
+            <h2>¡Bienvenido Explorador! 🚀</h2>
+            <p style="color: #94a3b8; margin-bottom: 20px;">Ingresa tu nombre completo para comenzar el ascenso en La Escalera del Saber.</p>
+            <input type="text" id="student-name" placeholder="Ej. Luis Mario Epieyu" autocomplete="off">
+            <button class="btn-next" style="width: 100%; justify-content: center;" onclick="iniciarEvaluacion()">Comenzar Aventura ➔</button>
         </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Literal - Escalón 3</span>
-            <div class="question-title">3. ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos? *</div>
-            <div class="options">
-                <label><input type="radio" name="q3" value="La construcción de las grandes pirámides de piedra"> La construcción de las grandes pirámides de piedra.</label>
-                <label><input type="radio" name="q3" value="La creación de canales de navegación rápidos"> La creación de canales de navegación rápidos.</label>
-                <label><input type="radio" name="q3" value="El cultivo abundante de cereales como el trigo y la cebada" data-correct="true"> El cultivo abundante de cereales como el trigo y la cebada.</label>
-                <label><input type="radio" name="q3" value="La limpieza del agua para el consumo humano"> La limpieza del agua para el consumo humano.</label>
+
+        <!-- TARJETA DE PREGUNTA EN JUEGO -->
+        <div class="question-container" id="question-card">
+            <div class="card-header">
+                <div class="level-badge">
+                    📖 <span id="lbl-level-title">Nivel 1</span>
+                </div>
+                <div class="progress-bar-container">
+                    <span style="font-size: 0.8rem; color: #94a3b8;" id="lbl-progress-text">Pregunta 1 de 10</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <div class="topic-pill" id="lbl-topic">TEXTO 1: El ciclo de la vida (Biología)</div>
+                <div class="question-title" id="lbl-question-title">1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *</div>
+
+                <div class="options-list" id="options-container">
+                    <!-- Las opciones se generan dinámicamente -->
+                </div>
+            </div>
+
+            <div class="card-footer">
+                <div class="motivation-text">
+                    <span style="font-size: 1.5rem;">⭐</span>
+                    <div>
+                        <strong>¡Excelente!</strong><br>
+                        Cada respuesta te acerca a la meta.
+                    </div>
+                </div>
+                <button class="btn-next" onclick="procesarRespuesta()">Siguiente ➔</button>
             </div>
         </div>
-        <button onclick="procesarRespuesta(3, 'literal')">Subir al Siguiente Escalón ➔</button>
-    </div>
 
-    <!-- PREGUNTA 4 (CRÍTICO) -->
-    <div id="step-4" class="step-box">
-        <div class="context-box">
-            <b>Texto 2: El Nilo y Egipto (Historia)</b> (Continuación)
+        <!-- MODAL DE RESULTADOS FINALES -->
+        <div class="modal-success" id="modal-success">
+            <h2 style="color: #38bdf8; margin-bottom: 10px;">¡Felicidades! Has llegado a la cima 🏆</h2>
+            <p id="final-student-name" style="color: white; font-weight: 700; font-size: 1.1rem;"></p>
+            <p id="final-score-text" style="color: #94a3b8; margin-top: 10px;"></p>
+            
+            <div class="badge-result" id="final-badge"></div>
+            
+            <p style="color: #34d399; font-weight: 700; margin-top: 20px;" id="status-envio">Enviando resultados al docente...</p>
         </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Crítico - Escalón 4</span>
-            <div class="question-title">4. ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia? *</div>
-            <div class="options">
-                <label><input type="radio" name="q4" value="Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar"> Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.</label>
-                <label><input type="radio" name="q4" value="Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social" data-correct="true"> Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.</label>
-                <label><input type="radio" name="q4" value="Dificultó el progreso porque las inundaciones destruían constantemente las casas"> Dificultó el progreso porque las inundaciones destruían constantemente las casas.</label>
-                <label><input type="radio" name="q4" value="Solo sirvió como defensa natural contra los enemigos extranjeros"> Solo sirvió como defensa natural contra los enemigos extranjeros.</label>
+
+    </main>
+
+    <!-- PIE DE PÁGINA -->
+    <footer>
+        <div class="footer-item">
+            <div class="footer-icon">📖</div>
+            <div class="footer-info">
+                <h4>Comprensión lectora</h4>
+                <p>Lee con atención</p>
             </div>
         </div>
-        <button onclick="procesarRespuesta(4, 'critico')">Subir al Siguiente Escalón ➔</button>
-    </div>
-
-    <!-- PREGUNTA 5 (INFERENCIAL) -->
-    <div id="step-5" class="step-box">
-        <div class="context-box">
-            <b>Texto 3: El uso de la tecnología (Sociedad)</b><br>
-            El uso excesivo de dispositivos electrónicos antes de dormir se ha convertido en una preocupación de salud pública. La luz azul emitida por las pantallas engaña a nuestro cerebro haciéndole creer que aún es de día, lo que inhibe la producción de melatonina, la hormona encargada de inducir el sueño. Como resultado, muchos jóvenes reportan fatiga, falta de concentración en clases y mal humor durante el día.
-        </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Inferencial - Escalón 5</span>
-            <div class="question-title">5. ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar? *</div>
-            <div class="options">
-                <label><input type="radio" name="q5" value="La luz azul mejora la memoria a largo plazo"> La luz azul mejora la memoria a largo plazo.</label>
-                <label><input type="radio" name="q5" value="No existe ninguna relación; el cansancio es solo una excusa"> No existe ninguna relación; el cansancio es solo una excusa.</label>
-                <label><input type="radio" name="q5" value="La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo" data-correct="true"> La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo.</label>
-                <label><input type="radio" name="q5" value="El uso de dispositivos es necesario para estudiar mejor"> El uso de dispositivos es necesario para estudiar mejor.</label>
+        <div class="footer-item">
+            <div class="footer-icon">🧠</div>
+            <div class="footer-info">
+                <h4>Pensamiento crítico</h4>
+                <p>Analiza y reflexiona</p>
             </div>
         </div>
-        <button onclick="procesarRespuesta(5, 'inferencial')">Subir al Siguiente Escalón ➔</button>
-    </div>
-
-    <!-- PREGUNTA 6 (CRÍTICO) -->
-    <div id="step-6" class="step-box">
-        <div class="context-box">
-            <b>Texto 3: El uso de la tecnología (Sociedad)</b> (Continuación)
-        </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Crítico - Escalón 6</span>
-            <div class="question-title">6. ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir? *</div>
-            <div class="options">
-                <label><input type="radio" name="q6" value="Promueve el uso de dispositivos como una forma de relajación"> Promueve el uso de dispositivos como una forma de relajación.</label>
-                <label><input type="radio" name="q6" value="Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo" data-correct="true"> Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.</label>
-                <label><input type="radio" name="q6" value="Considera que la tecnología es la causa de todas las enfermedades modernas"> Considera que la tecnología es la causa de todas las enfermedades modernas.</label>
-                <label><input type="radio" name="q6" value="Sugiere que la melatonina no es importante para los jóvenes"> Sugiere que la melatonina no es importante para los jóvenes.</label>
+        <div class="footer-item">
+            <div class="footer-icon">🎯</div>
+            <div class="footer-info">
+                <h4>Aprendizaje</h4>
+                <p>Tu esfuerzo cuenta</p>
             </div>
         </div>
-        <button onclick="procesarRespuesta(6, 'critico')">Subir al Siguiente Escalón ➔</button>
-    </div>
-
-    <!-- PREGUNTA 7 (LITERAL) -->
-    <div id="step-7" class="step-box">
-        <div class="context-box">
-            <b>Texto 4: La semilla ambiciosa (Fábula)</b><br>
-            Una pequeña semilla cayó en tierra seca y dura. A su alrededor, las otras semillas se quejaban de la falta de agua, pero esta semilla decidió abrirse camino buscando las profundidades de la tierra, donde sabía que encontraría humedad. Años después, mientras las otras semillas habían desaparecido, aquella pequeña semilla se había convertido en un robusto árbol cuyas raíces profundas sostenían todo el jardín.
-        </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Literal - Escalón 7</span>
-            <div class="question-title">7. ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca? *</div>
-            <div class="options">
-                <label><input type="radio" name="q7" value="Se quedó quieta esperando que lloviera"> Se quedó quieta esperando que lloviera.</label>
-                <label><input type="radio" name="q7" value="Intentó buscar agua en las profundidades de la tierra" data-correct="true"> Intentó buscar agua en las profundidades de la tierra.</label>
-                <label><input type="radio" name="q7" value="Se quejó junto con las otras semillas"> Se quejó junto con las otras semillas.</label>
-                <label><input type="radio" name="q7" value="Se dejó llevar por el viento hacia otro lugar"> Se dejó llevar por el viento hacia otro lugar.</label>
+        <div class="footer-item">
+            <div class="footer-icon">🏔️</div>
+            <div class="footer-info">
+                <h4>¡Sigue avanzando!</h4>
+                <p>La meta está más cerca</p>
             </div>
         </div>
-        <button onclick="procesarRespuesta(7, 'literal')">Subir al Siguiente Escalón ➔</button>
-    </div>
+    </footer>
 
-    <!-- PREGUNTA 8 (INFERENCIAL) -->
-    <div id="step-8" class="step-box">
-        <div class="context-box">
-            <b>Texto 4: La semilla ambiciosa (Fábula)</b> (Continuación)
-        </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Inferencial - Escalón 8</span>
-            <div class="question-title">8. ¿Qué representa la acción de la semilla en esta historia? *</div>
-            <div class="options">
-                <label><input type="radio" name="q8" value="La importancia de la suerte en la vida"> La importancia de la suerte en la vida.</label>
-                <label><input type="radio" name="q8" value="La necesidad de adaptarse y esforzarse para superar las dificultades" data-correct="true"> La necesidad de adaptarse y esforzarse para superar las dificultades.</label>
-                <label><input type="radio" name="q8" value="Que las plantas son seres inteligentes que planean el futuro"> Que las plantas son seres inteligentes que planean el futuro.</label>
-                <label><input type="radio" name="q8" value="Que es mejor vivir en lugares cómodos que en lugares difíciles"> Que es mejor vivir en lugares cómodos que en lugares difíciles.</label>
-            </div>
-        </div>
-        <button onclick="procesarRespuesta(8, 'inferencial')">Subir al Siguiente Escalón ➔</button>
-    </div>
+    <script>
+        // --- BASE DE DATOS DE PREGUNTAS ---
+        const bancoPreguntas = [
+            {
+                num: 1,
+                nivel: "Nivel 1",
+                tema: "TEXTO 1: El ciclo de la vida (Biología)",
+                pregunta: "1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *",
+                opciones: [
+                    { texto: "Comienzan a caminar sobre el agua.", correcta: false },
+                    { texto: "Sus pulmones desaparecen.", correcta: false },
+                    { texto: "El método de respiración y su anatomía física.", correcta: true },
+                    { texto: "Su dieta se vuelve exclusivamente acuática.", correcta: false }
+                ]
+            },
+            {
+                num: 2,
+                nivel: "Nivel 2",
+                tema: "TEXTO 1: El ciclo de la vida (Biología) (Continuación)",
+                pregunta: "2. ¿Qué se puede deducir sobre el entorno de vida de las ranas? *",
+                opciones: [
+                    { texto: "Los renacuajos son más rápidos que las ranas adultas.", correcta: false },
+                    { texto: "La metamorfosis ocurre solo en climas fríos.", correcta: false },
+                    { texto: "Solo pueden vivir en entornos húmedos debido a su piel.", correcta: false },
+                    { texto: "Son animales que necesitan adaptarse a dos medios distintos durante su vida.", correcta: true }
+                ]
+            },
+            {
+                num: 3,
+                nivel: "Nivel 3",
+                tema: "TEXTO 2: El Nilo y Egipto (Historia)",
+                pregunta: "3. ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos? *",
+                opciones: [
+                    { texto: "La construcción de las grandes pirámides de piedra.", correcta: false },
+                    { texto: "La creación de canales de navegación rápidos.", correcta: false },
+                    { texto: "El cultivo abundante de cereales como el trigo y la cebada.", correcta: true },
+                    { texto: "La limpieza del agua para el consumo humano.", correcta: false }
+                ]
+            },
+            {
+                num: 4,
+                nivel: "Nivel 4",
+                tema: "TEXTO 2: El Nilo y Egipto (Historia) (Continuación)",
+                pregunta: "4. ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia? *",
+                opciones: [
+                    { texto: "Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.", correcta: false },
+                    { texto: "Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.", correcta: true },
+                    { texto: "Dificultó el progreso porque las inundaciones destruían constantemente las casas.", correcta: false },
+                    { texto: "Solo sirvió como defensa natural contra los enemigos extranjeros.", correcta: false }
+                ]
+            },
+            {
+                num: 5,
+                nivel: "Nivel 5",
+                tema: "TEXTO 3: El uso de la tecnología (Sociedad)",
+                pregunta: "5. ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar? *",
+                opciones: [
+                    { texto: "La luz azul mejora la memoria a largo plazo.", correcta: false },
+                    { texto: "No existe ninguna relación; el cansancio es solo una excusa.", correcta: false },
+                    { texto: "La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo.", correcta: true },
+                    { texto: "El uso de dispositivos es necesario para estudiar mejor.", correcta: false }
+                ]
+            },
+            {
+                num: 6,
+                nivel: "Nivel 6",
+                tema: "TEXTO 3: El uso de la tecnología (Sociedad) (Continuación)",
+                pregunta: "6. ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir? *",
+                opciones: [
+                    { texto: "Promueve el uso de dispositivos como una forma de relajación.", correcta: false },
+                    { texto: "Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.", correcta: true },
+                    { texto: "Considera que la tecnología es la causa de todas las enfermedades modernas.", correcta: false },
+                    { texto: "Sugiere que la melatonina no es importante para los jóvenes.", correcta: false }
+                ]
+            },
+            {
+                num: 7,
+                nivel: "Nivel 7",
+                tema: "TEXTO 4: La semilla ambiciosa (Fábula)",
+                pregunta: "7. ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca? *",
+                opciones: [
+                    { texto: "Se quedó quieta esperando que lloviera.", correcta: false },
+                    { texto: "Intentó buscar agua en las profundidades de la tierra.", correcta: true },
+                    { texto: "Se quejó junto con las otras semillas.", correcta: false },
+                    { texto: "Se dejó llevar por el viento hacia otro lugar.", correcta: false }
+                ]
+            },
+            {
+                num: 8,
+                nivel: "Nivel 8",
+                tema: "TEXTO 4: La semilla ambiciosa (Fábula) (Continuación)",
+                pregunta: "8. ¿Qué representa la acción de la semilla en esta historia? *",
+                opciones: [
+                    { texto: "La importancia de la suerte en la vida.", correcta: false },
+                    { texto: "La necesidad de adaptarse y esforzarse para superar las dificultades.", correcta: true },
+                    { texto: "Que las plantas son seres inteligentes que planean el futuro.", correcta: false },
+                    { texto: "Que es mejor vivir en lugares cómodos que en lugares difíciles.", correcta: false }
+                ]
+            },
+            {
+                num: 9,
+                nivel: "Nivel 9",
+                tema: "Exploración espacial (Ciencia)",
+                pregunta: "9. ¿Por qué la exploración de Marte es un tema de debate? *",
+                opciones: [
+                    { texto: "Porque no hay evidencia de que Marte sea un planeta interesante.", correcta: false },
+                    { texto: "Porque los científicos no quieren cooperar entre sí.", correcta: false },
+                    { texto: "Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes.", correcta: true },
+                    { texto: "Porque el costo es bajo pero los riesgos son muy altos.", correcta: false }
+                ]
+            },
+            {
+                num: 10,
+                nivel: "Nivel 10",
+                tema: "Exploración espacial (Ciencia) (Continuación)",
+                pregunta: "10. ¿Cuál es el dilema principal que plantea el texto? *",
+                opciones: [
+                    { texto: "La tecnología actual es incapaz de llegar a Marte.", correcta: false },
+                    { texto: "La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.", correcta: true },
+                    { texto: "Marte es un planeta demasiado peligroso para los seres humanos.", correcta: false },
+                    { texto: "La falta de interés de la población en la exploración espacial.", correcta: false }
+                ]
+            }
+        ];
 
-    <!-- PREGUNTA 9 (INFERENCIAL) -->
-    <div id="step-9" class="step-box">
-        <div class="context-box">
-            <b>Exploración espacial (Ciencia)</b><br>
-            La exploración de Marte ha sido un sueño de la humanidad durante décadas. Los científicos argumentan que estudiar el planeta rojo podría revelar si alguna vez hubo vida allí o si, en el futuro, los humanos podrían habitarlo. Sin embargo, este proceso es extremadamente costoso y requiere una cooperación internacional sin precedentes, lo que genera debates sobre si ese dinero debería invertirse primero en solucionar problemas de la Tierra.
-        </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Inferencial - Escalón 9</span>
-            <div class="question-title">9. ¿Por qué la exploración de Marte es un tema de debate? *</div>
-            <div class="options">
-                <label><input type="radio" name="q9" value="Porque no hay evidencia de que Marte sea un planeta interesante"> Porque no hay evidencia de que Marte sea un planeta interesante.</label>
-                <label><input type="radio" name="q9" value="Porque los científicos no quieren cooperar entre sí"> Porque los científicos no quieren cooperar entre sí.</label>
-                <label><input type="radio" name="q9" value="Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes" data-correct="true"> Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes.</label>
-                <label><input type="radio" name="q9" value="Porque el costo es bajo pero los riesgos son muy altos"> Porque el costo es bajo pero los riesgos son muy altos.</label>
-            </div>
-        </div>
-        <button onclick="procesarRespuesta(9, 'inferencial')">Subir al Último Escalón ➔</button>
-    </div>
+        // --- VARIABLES DE ESTADO ---
+        let studentName = "";
+        let indicePregunta = 0;
+        let puntajeTotal = 0;
+        let opcionSeleccionada = null;
+        let resultadosEstudiante = { q1:"❌", q2:"❌", q3:"❌", q4:"❌", q5:"❌", q6:"❌", q7:"❌", q8:"❌", q9:"❌", q10:"❌" };
 
-    <!-- PREGUNTA 10 (CRÍTICO) -->
-    <div id="step-10" class="step-box">
-        <div class="context-box">
-            <b>Exploración espacial (Ciencia)</b> (Continuación)
-        </div>
-        <div class="question-card">
-            <span class="badge-nivel">Nivel Crítico - Escalón 10</span>
-            <div class="question-title">10. ¿Cuál es el dilema principal que plantea el texto? *</div>
-            <div class="options">
-                <label><input type="radio" name="q10" value="La tecnología actual es incapaz de llegar a Marte"> La tecnología actual es incapaz de llegar a Marte.</label>
-                <label><input type="radio" name="q10" value="La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales" data-correct="true"> La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.</label>
-                <label><input type="radio" name="q10" value="Marte es un planeta demasiado peligroso para los seres humanos"> Marte es un planeta demasiado peligroso para los seres humanos.</label>
-                <label><input type="radio" name="q10" value="La falta de interés de la población en la exploración espacial"> La falta de interés de la población en la exploración espacial.</label>
-            </div>
-        </div>
-        <button onclick="procesarRespuesta(10, 'critico')">¡Alcanzar la Cima! 🏆</button>
-    </div>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwLnNXJmQDhg_nVjV7CGPzdAU5V2gfCpQXx_UqSDWHkXQgkrPLIYbp1wDMNwlg-EOVlZw/exec";
 
-    <!-- PANTALLA DE RESULTADOS -->
-    <div id="step-success" class="step-box" style="text-align: center;">
-        <h2 style="color: #38bdf8; font-size: 1.8rem; margin-bottom: 10px;">¡Felicidades! Has llegado a la cima</h2>
-        <p id="score-text" style="font-size: 1.25rem; font-weight: 700; margin: 20px 0; color: #f8fafc;"></p>
-        <h3 style="color: #94a3b8;">Insignia Obtenida:</h3>
-        <div class="badge-container" id="badges-list"></div>
-        <p style="margin-top: 30px; color: #34d399; font-weight: 700;" id="status-envio">Enviando resultados al docente...</p>
-    </div>
-</div>
+        function iniciarEvaluacion() {
+            studentName = document.getElementById('student-name').value.trim();
+            if(!studentName) {
+                alert("Por favor, ingresa tu nombre para comenzar.");
+                return;
+            }
 
-<!-- MODAL DE FEEDBACK -->
-<div id="feedback-overlay" class="feedback-overlay">
-    <div class="feedback-content">
-        <div id="fb-emoji" class="feedback-emoji">😃</div>
-        <div id="fb-title" class="feedback-text">¡Excelente!</div>
-        <div id="fb-sub" class="feedback-sub">+10 Puntos sumados</div>
-    </div>
-</div>
-
-<script>
-let studentName = "";
-let resultadosEstudiante = {
-    q1: "❌", q2: "❌", q3: "❌", q4: "❌", q5: "❌",
-    q6: "❌", q7: "❌", q8: "❌", q9: "❌", q10: "❌"
-};
-let puntajeTotal = 0;
-let escalonActual = 0;
-
-// Motor Gráfico Canvas
-let canvas, ctx;
-let playerX = 40;
-let playerY = 160;
-
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwLnNXJmQDhg_nVjV7CGPzdAU5V2gfCpQXx_UqSDWHkXQgkrPLIYbp1wDMNwlg-EOVlZw/exec";
-
-function aleatorizarOpciones() {
-    document.querySelectorAll('.options').forEach(container => {
-        let labels = Array.from(container.children);
-        for (let i = labels.length - 1; i > 0; i--) {
-            let j = Math.floor(Math.random() * (i + 1));
-            container.appendChild(labels[j]);
-        }
-    });
-}
-
-function iniciarEvaluacion() {
-    studentName = document.getElementById('student-name').value.trim();
-    if(!studentName) {
-        alert('Por favor ingrese su nombre completo para continuar.');
-        return;
-    }
-    
-    aleatorizarOpciones();
-
-    document.getElementById('hud-name').innerText = studentName;
-    document.getElementById('hud-bar').style.display = 'flex';
-    document.getElementById('canvas-container').style.display = 'block';
-    
-    canvas = document.getElementById('gameCanvas');
-    ctx = canvas.getContext('2d');
-    
-    aplicarTemaNivel('literal');
-    cambiarPaso(1);
-    dibujarEscenario();
-}
-
-function aplicarTemaNivel(nivel) {
-    const root = document.documentElement;
-    if(nivel === 'literal') {
-        root.style.setProperty('--current-theme', 'var(--literal-color)');
-        root.style.setProperty('--current-bg', 'var(--literal-bg)');
-        root.style.setProperty('--current-border', 'var(--literal-border)');
-    } else if(nivel === 'inferencial') {
-        root.style.setProperty('--current-theme', 'var(--inferencial-color)');
-        root.style.setProperty('--current-bg', 'var(--inferencial-bg)');
-        root.style.setProperty('--current-border', 'var(--inferencial-border)');
-    } else if(nivel === 'critico') {
-        root.style.setProperty('--current-theme', 'var(--critico-color)');
-        root.style.setProperty('--current-bg', 'var(--critico-bg)');
-        root.style.setProperty('--current-border', 'var(--critico-border)');
-    }
-}
-
-function cambiarPaso(paso) {
-    document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
-    if(paso !== 'success') {
-        document.getElementById(`step-${paso}`).classList.add('active');
-    } else {
-        document.getElementById('step-success').classList.add('active');
-        document.getElementById('canvas-container').style.display = 'none';
-    }
-    window.scrollTo(0, 0);
-}
-
-function procesarRespuesta(numQ, nivelCognitivo) {
-    const seleccionada = document.querySelector(`input[name="q${numQ}"]:checked`);
-    
-    if(!seleccionada) {
-        alert('Debe seleccionar una opción de respuesta antes de avanzar.');
-        return;
-    }
-
-    const esCorrecta = seleccionada.getAttribute('data-correct') === 'true';
-    
-    resultadosEstudiante[`q${numQ}`] = esCorrecta ? "✅" : "❌";
-
-    const overlay = document.getElementById('feedback-overlay');
-    const emoji = document.getElementById('fb-emoji');
-    const title = document.getElementById('fb-title');
-    const sub = document.getElementById('fb-sub');
-
-    if(esCorrecta) {
-        puntajeTotal += 10;
-        escalonActual++;
-        playerX += 62; 
-
-        document.getElementById('hud-score').innerText = `${puntajeTotal} / 100 pts`;
-        
-        let cuantasEstrellas = Math.floor(puntajeTotal / 30) + 1;
-        document.getElementById('hud-stars').innerText = "⭐".repeat(cuantasEstrellas);
-
-        emoji.innerText = "🎉";
-        title.innerText = "¡Respuesta Correcta!";
-        sub.innerText = "+10 Puntos | ¡Recogiste un libro y subes de escalón!";
-        overlay.style.display = "flex";
-        
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-
-        dibujarEscenario();
-
-        setTimeout(() => {
-            overlay.style.display = "none";
-            avanzarSiguientePregunta(numQ);
-        }, 1600);
-
-    } else {
-        emoji.innerText = "❌";
-        title.innerText = "Respuesta Incorrecta";
-        sub.innerText = "No sumas puntos ni recoges el libro en este escalón.";
-        overlay.style.display = "flex";
-
-        dibujarEscenario();
-
-        setTimeout(() => {
-            overlay.style.display = "none";
-            avanzarSiguientePregunta(numQ);
-        }, 1600);
-    }
-}
-
-function avanzarSiguientePregunta(numQ) {
-    if(numQ === 10) {
-        finalizarEvaluacion();
-    } else {
-        let siguienteNivel = 'literal';
-        if([2, 5, 8, 9].includes(numQ + 1)) siguienteNivel = 'inferencial';
-        if([4, 6, 10].includes(numQ + 1)) siguienteNivel = 'critico';
-        
-        aplicarTemaNivel(siguienteNivel);
-        cambiarPaso(numQ + 1);
-    }
-}
-
-function dibujarEscenario() {
-    if(!ctx) return;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    ctx.fillStyle = "#020617";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    for(let i = 0; i < 10; i++) {
-        let x = 25 + (i * 64);
-        let y = 175 - (i * 13);
-
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(x + 2, y + 4, 58, 10);
-
-        ctx.fillStyle = (i < escalonActual) ? "#10b981" : "#475569";
-        ctx.fillRect(x, y, 58, 8);
-
-        ctx.fillStyle = (i < escalonActual) ? "#34d399" : "#64748b";
-        ctx.fillRect(x, y, 58, 2);
-
-        if(i < 9) {
-            ctx.fillStyle = "#334155";
-            ctx.fillRect(x + 46, y - 13, 6, 13);
+            document.getElementById('modal-register').style.display = 'none';
+            document.getElementById('question-card').style.display = 'block';
+            
+            cargarPregunta();
         }
 
-        if (i >= escalonActual) {
-            let itemX = x + 25;
-            let itemY = y - 8;
+        function cargarPregunta() {
+            opcionSeleccionada = null;
+            const q = bancoPreguntas[indicePregunta];
 
-            if (i % 2 === 0) {
-                ctx.fillStyle = "#38bdf8";
-                ctx.fillRect(itemX, itemY, 8, 6);
-                ctx.fillStyle = "#ffffff";
-                ctx.fillRect(itemX + 2, itemY + 1, 4, 4);
+            // Actualizar HUD
+            document.getElementById('hud-level').innerText = `${q.num}/10`;
+            document.getElementById('lbl-level-title').innerText = q.nivel;
+            document.getElementById('lbl-progress-text').innerText = `Pregunta ${q.num} de 10`;
+            document.getElementById('progress-fill').style.width = `${(q.num / 10) * 100}%`;
+
+            // Cargar textos de pregunta
+            document.getElementById('lbl-topic').innerText = q.tema;
+            document.getElementById('lbl-question-title').innerText = q.pregunta;
+
+            // Aleatorizar opciones para este cliente/equipo
+            let opcionesMezcladas = [...q.opciones];
+            opcionesMezcladas.sort(() => Math.random() - 0.5);
+
+            // Generar HTML de opciones
+            const container = document.getElementById('options-container');
+            container.innerHTML = "";
+
+            const letras = ['A', 'B', 'C', 'D'];
+
+            opcionesMezcladas.forEach((op, index) => {
+                const item = document.createElement('div');
+                item.className = 'option-item';
+                item.onclick = () => seleccionarOpcion(item, op);
+
+                item.innerHTML = `
+                    <div class="option-letter">${letras[index]}</div>
+                    <div class="option-text">${op.texto}</div>
+                    <div class="option-check">✓</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function seleccionarOpcion(element, opcionObj) {
+            document.querySelectorAll('.option-item').forEach(el => el.classList.remove('selected'));
+            element.classList.add('selected');
+            opcionSeleccionada = opcionObj;
+        }
+
+        function procesarRespuesta() {
+            if(!opcionSeleccionada) {
+                alert("Por favor selecciona una opción antes de continuar.");
+                return;
+            }
+
+            const qActual = bancoPreguntas[indicePregunta];
+
+            if(opcionSeleccionada.correcta) {
+                puntajeTotal += 10;
+                resultadosEstudiante[`q${qActual.num}`] = "✅";
+                document.getElementById('hud-score').innerText = puntajeTotal;
+                confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
             } else {
-                ctx.fillStyle = "#f59e0b";
-                ctx.fillRect(itemX + 2, itemY, 4, 6);
-                ctx.fillRect(itemX, itemY + 2, 8, 2);
+                resultadosEstudiante[`q${qActual.num}`] = "❌";
+            }
+
+            indicePregunta++;
+
+            if(indicePregunta < bancoPreguntas.length) {
+                cargarPregunta();
+            } else {
+                finalizarJuego();
             }
         }
-    }
 
-    let cimaX = 25 + (10 * 64) - 15;
-    let cimaY = 175 - (10 * 13) + 2;
+        function finalizarJuego() {
+            document.getElementById('question-card').style.display = 'none';
+            document.getElementById('modal-success').style.display = 'block';
 
-    ctx.fillStyle = "#e2e8f0";
-    ctx.beginPath();
-    ctx.moveTo(cimaX, cimaY);
-    ctx.lineTo(cimaX + 18, cimaY - 6);
-    ctx.lineTo(cimaX + 36, cimaY);
-    ctx.lineTo(cimaX + 18, cimaY + 4);
-    ctx.fill();
+            let insigniaFinal = "";
+            if (puntajeTotal === 100) {
+                insigniaFinal = "🏆 Leyenda de la Lectura (100 pts)";
+            } else if (puntajeTotal >= 70) {
+                insigniaFinal = "🌟 Experto en Comprensión (70-90 pts)";
+            } else if (puntajeTotal >= 40) {
+                insigniaFinal = "🧭 Explorador Literario (40-60 pts)";
+            } else {
+                insigniaFinal = "📖 Novato de la Lectura (0-30 pts)";
+            }
 
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(cimaX + 2, cimaY - 4, 14, 6);
-    ctx.fillRect(cimaX + 20, cimaY - 4, 14, 6);
+            document.getElementById('final-student-name').innerText = `Estudiante: ${studentName}`;
+            document.getElementById('final-score-text').innerText = `Puntaje Final: ${puntajeTotal} / 100 Puntos (${puntajeTotal}%)`;
+            document.getElementById('final-badge').innerText = insigniaFinal;
 
-    ctx.fillStyle = "#f59e0b";
-    ctx.fillRect(cimaX + 15, cimaY - 18, 6, 12);
-    ctx.fillRect(cimaX + 12, cimaY - 20, 12, 3);
-    ctx.fillStyle = "#d97706";
-    ctx.fillRect(cimaX + 17, cimaY - 6, 2, 4);
-    ctx.fillRect(cimaX + 13, cimaY - 2, 10, 2);
+            // Datos limpios para Google Sheets
+            const datos = {
+                fecha: new Date().toLocaleString(),
+                nombre: studentName,
+                puntaje: puntajeTotal,
+                porcentaje: `${puntajeTotal}%`,
+                q1: resultadosEstudiante.q1,
+                q2: resultadosEstudiante.q2,
+                q3: resultadosEstudiante.q3,
+                q4: resultadosEstudiante.q4,
+                q5: resultadosEstudiante.q5,
+                q6: resultadosEstudiante.q6,
+                q7: resultadosEstudiante.q7,
+                q8: resultadosEstudiante.q8,
+                q9: resultadosEstudiante.q9,
+                q10: resultadosEstudiante.q10
+            };
 
-    let avX = playerX;
-    let avY = playerY - (escalonActual * 13);
-
-    ctx.fillStyle = "rgba(0,0,0,0.4)";
-    ctx.fillRect(avX + 2, avY + 18, 14, 4);
-
-    ctx.fillStyle = "#38bdf8";
-    ctx.fillRect(avX + 2, avY + 4, 12, 12);
-
-    ctx.fillStyle = "#f97316";
-    ctx.fillRect(avX - 1, avY + 6, 4, 9);
-
-    ctx.fillStyle = "#fbcfe8";
-    ctx.fillRect(avX + 3, avY - 3, 10, 8);
-
-    ctx.fillStyle = "#ef4444";
-    ctx.fillRect(avX + 2, avY - 6, 12, 4);
-    ctx.fillRect(avX + 10, avY - 8, 6, 3);
-}
-
-function finalizarEvaluacion() {
-    // Definir la insignia única según el puntaje total obtenido
-    let insigniaFinal = "";
-    if (puntajeTotal === 100) {
-        insigniaFinal = "🏆 Leyenda de la Lectura (100 pts)";
-    } else if (puntajeTotal >= 70) {
-        insigniaFinal = "🌟 Experto en Comprensión (70-90 pts)";
-    } else if (puntajeTotal >= 40) {
-        insigniaFinal = "🧭 Explorador Literario (40-60 pts)";
-    } else {
-        insigniaFinal = "📖 Novato de la Lectura (0-30 pts)";
-    }
-
-    let porcentajeIndividual = `${puntajeTotal}%`;
-
-    cambiarPaso('success');
-    document.getElementById('score-text').innerText = `Estudiante: ${studentName}\nPuntaje Final: ${puntajeTotal} / 100 Puntos (${porcentajeIndividual})`;
-
-    // Mostrar la insignia visual en pantalla
-    let badgeHtml = `<div class="badge">${insigniaFinal}</div>`;
-    document.getElementById('badges-list').innerHTML = badgeHtml;
-
-    // Datos limpios para Google Sheets (sin enviar la insignia)
-    const datos = {
-        fecha: new Date().toLocaleString(),
-        nombre: studentName,
-        puntaje: puntajeTotal,
-        porcentaje: porcentajeIndividual,
-        q1: resultadosEstudiante.q1,
-        q2: resultadosEstudiante.q2,
-        q3: resultadosEstudiante.q3,
-        q4: resultadosEstudiante.q4,
-        q5: resultadosEstudiante.q5,
-        q6: resultadosEstudiante.q6,
-        q7: resultadosEstudiante.q7,
-        q8: resultadosEstudiante.q8,
-        q9: resultadosEstudiante.q9,
-        q10: resultadosEstudiante.q10
-    };
-
-    fetch(WEB_APP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(datos)
-    })
-    .then(() => {
-        document.getElementById('status-envio').innerText = "✅ ¡Resultados detallados enviados al docente con éxito!";
-    })
-    .catch((error) => {
-        console.error("Error al enviar:", error);
-        document.getElementById('status-envio').innerText = "❌ Hubo un error al enviar los resultados.";
-    });
-}
-</script>
-
+            fetch(WEB_APP_URL, {
+                method: "POST",
+                mode: "no-cors",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(datos)
+            })
+            .then(() => {
+                document.getElementById('status-envio').innerText = "✅ ¡Resultados detallados enviados al docente con éxito!";
+            })
+            .catch((error) => {
+                console.error("Error al enviar:", error);
+                document.getElementById('status-envio').innerText = "❌ Hubo un error al enviar los resultados.";
+            });
+        }
+    </script>
 </body>
 </html>
