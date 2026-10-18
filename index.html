@@ -4,13 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Escalera del Saber - Comprensión Lectora</title>
+    <!-- Librerías de Three.js y Confeti -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
             --bg-dark: #07132b;
             --blue-main: #0066ff;
             --blue-dark: #003399;
-            --blue-card-bg: rgba(7, 24, 56, 0.90);
+            --blue-card-bg: rgba(7, 24, 56, 0.92);
             --border-glow: #1a5fff;
             --text-white: #ffffff;
             --text-muted: #94a3b8;
@@ -121,7 +123,7 @@
             font-weight: 600;
         }
 
-        /* --- CONTENEDOR PRINCIPAL DEL JUEGO (LAYOUT DE DOS COLUMNAS) --- */
+        /* --- CONTENEDOR PRINCIPAL: ESCENARIO 3D IZQUIERDA + TARJETA DERECHA --- */
         .game-viewport {
             flex: 1;
             position: relative;
@@ -129,27 +131,20 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 4%;
-            background-image: url('image_cda8bc.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            min-height: 600px;
-            gap: 30px;
+            min-height: 620px;
         }
 
-        /* Columna Izquierda: Escenario Gráfico con la Escalera y el Niño */
-        .scenery-container {
-            flex: 1;
+        /* Lienzo 3D de Three.js (Escenario interactivo izquierdo) */
+        #canvas3d-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 55%;
             height: 100%;
-            min-height: 520px;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding-bottom: 20px;
+            z-index: 1;
         }
 
-        /* Registro Modal / Contenedor */
+        /* Registro Modal */
         .modal-register {
             position: absolute;
             top: 50%;
@@ -182,16 +177,17 @@
         /* --- TARJETA DE PREGUNTA DERECHA --- */
         .question-container {
             width: 100%;
-            max-width: 580px;
+            max-width: 540px;
             background: var(--blue-card-bg);
             border: 2px solid rgba(0, 102, 255, 0.6);
             border-radius: 24px;
             backdrop-filter: blur(12px);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 102, 255, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
             overflow: hidden;
             display: none; 
             animation: slideIn 0.4s ease-out;
-            z-index: 5;
+            z-index: 10;
+            margin-left: auto;
         }
 
         @keyframes slideIn {
@@ -217,7 +213,6 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .progress-bar-container {
@@ -244,7 +239,7 @@
         }
 
         .card-body {
-            padding: 22px 25px;
+            padding: 20px 25px;
             background: #ffffff;
             color: #0f172a;
         }
@@ -254,21 +249,20 @@
             background: #0066ff;
             color: #ffffff;
             font-weight: 700;
-            font-size: 0.85rem;
-            padding: 6px 14px;
+            font-size: 0.8rem;
+            padding: 5px 12px;
             border-radius: 20px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .question-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: 800;
             line-height: 1.4;
             color: #0f172a;
-            margin-bottom: 18px;
+            margin-bottom: 15px;
         }
 
-        /* OPCIONES DE RESPUESTA */
         .options-list {
             display: flex;
             flex-direction: column;
@@ -281,10 +275,9 @@
             background: #f8fafc;
             border: 2px solid #e2e8f0;
             border-radius: 14px;
-            padding: 12px 16px;
+            padding: 10px 14px;
             cursor: pointer;
             transition: all 0.2s ease;
-            position: relative;
         }
 
         .option-item:hover {
@@ -299,8 +292,8 @@
         }
 
         .option-letter {
-            width: 34px;
-            height: 34px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: #0066ff;
             color: white;
@@ -308,28 +301,28 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 14px;
+            margin-right: 12px;
             flex-shrink: 0;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .option-text {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #1e293b;
             flex: 1;
         }
 
         .option-check {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             background: #0284c7;
             color: white;
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             margin-left: 10px;
         }
 
@@ -338,7 +331,7 @@
         }
 
         .card-footer {
-            padding: 18px 25px;
+            padding: 16px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -350,7 +343,7 @@
             align-items: center;
             gap: 10px;
             color: #cbd5e1;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-style: italic;
         }
 
@@ -358,16 +351,13 @@
             background: linear-gradient(135deg, #0066ff, #0044cc);
             color: white;
             border: none;
-            padding: 14px 32px;
+            padding: 12px 28px;
             border-radius: 30px;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5);
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .btn-next:hover {
@@ -375,41 +365,31 @@
             filter: brightness(1.15);
         }
 
-        /* --- FOOTER INFORMATIVO --- */
-        footer {
-            background: rgba(3, 12, 34, 0.95);
-            padding: 15px 5%;
-            display: flex;
-            justify-content: space-around;
+        /* MODAL DE NOTIFICACIÓN DE RESPUESTA (ACIERTO / FALLO) */
+        .feedback-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(7, 24, 56, 0.85);
+            display: none;
+            justify-content: center;
             align-items: center;
-            border-top: 1px solid rgba(0, 102, 255, 0.2);
-            flex-wrap: wrap;
-            gap: 15px;
+            z-index: 1000;
         }
-
-        .footer-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .feedback-box {
+            background: #1e293b;
+            padding: 30px 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 2px solid #334155;
+            max-width: 380px;
+            width: 90%;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
         }
+        .feedback-icon { font-size: 4rem; margin-bottom: 10px; }
+        .feedback-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
+        .feedback-sub { font-size: 0.95rem; color: #94a3b8; }
 
-        .footer-icon {
-            font-size: 1.5rem;
-            color: #38bdf8;
-        }
-
-        .footer-info h4 {
-            font-size: 0.9rem;
-            color: #ffffff;
-            font-weight: 700;
-        }
-
-        .footer-info p {
-            font-size: 0.75rem;
-            color: #94a3b8;
-        }
-
-        /* MODAL FINAL RESULTADOS */
+        /* MODAL DE RESULTADOS FINALES */
         .modal-success {
             display: none;
             background: rgba(7, 24, 56, 0.95);
@@ -435,6 +415,29 @@
             margin: 20px 0;
             display: inline-block;
         }
+
+        /* --- FOOTER INFORMATIVO --- */
+        footer {
+            background: rgba(3, 12, 34, 0.95);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid rgba(0, 102, 255, 0.2);
+            flex-wrap: wrap;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .footer-icon { font-size: 1.5rem; color: #38bdf8; }
+        .footer-info h4 { font-size: 0.9rem; color: #ffffff; font-weight: 700; }
+        .footer-info p { font-size: 0.75rem; color: #94a3b8; }
     </style>
 </head>
 <body>
@@ -481,13 +484,11 @@
         </div>
     </header>
 
-    <!-- ESCENARIO CON FONDO 3D E INTERFAZ INTEGRADA -->
+    <!-- ESCENARIO PRINCIPAL -->
     <main class="game-viewport" id="viewport">
 
-        <!-- Columna Izquierda (Muestra visual de la escalera y el niño de fondo) -->
-        <div class="scenery-container">
-            <!-- El fondo 3D cubre perfectamente este espacio para que se vea el niño y la escalera de piedra -->
-        </div>
+        <!-- Contenedor del Escenario 3D Interactivo (Izquierda) -->
+        <div id="canvas3d-container"></div>
 
         <!-- REGISTRO DE ESTUDIANTE -->
         <div class="modal-register" id="modal-register">
@@ -545,6 +546,15 @@
 
     </main>
 
+    <!-- VENTANA DE NOTIFICACIÓN DE RESPUESTA (ACIERTO / FALLO) -->
+    <div class="feedback-overlay" id="feedback-overlay">
+        <div class="feedback-box">
+            <div class="feedback-icon" id="fb-icon">🎉</div>
+            <div class="feedback-title" id="fb-title" style="color: #38bdf8;">¡Respuesta Correcta!</div>
+            <div class="feedback-sub" id="fb-sub">+10 Puntos | ¡Avanzas un escalón!</div>
+        </div>
+    </div>
+
     <!-- PIE DE PÁGINA -->
     <footer>
         <div class="footer-item">
@@ -578,12 +588,11 @@
     </footer>
 
     <script>
+        // --- BASE DE DATOS DE LAS 10 PREGUNTAS ---
         const bancoPreguntas = [
             {
-                num: 1,
-                nivel: "Nivel 1",
-                tema: "TEXTO 1: El ciclo de la vida (Biología)",
-                pregunta: "1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *",
+                num: 1, nivel: "Nivel 1", tema: "TEXTO 1: El ciclo de la vida (Biología)",
+                pregunta: "1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas?",
                 opciones: [
                     { texto: "Comienzan a caminar sobre el agua.", correcta: false },
                     { texto: "Sus pulmones desaparecen.", correcta: false },
@@ -592,10 +601,8 @@
                 ]
             },
             {
-                num: 2,
-                nivel: "Nivel 2",
-                tema: "TEXTO 1: El ciclo de la vida (Biología) (Continuación)",
-                pregunta: "2. ¿Qué se puede deducir sobre el entorno de vida de las ranas? *",
+                num: 2, nivel: "Nivel 2", tema: "TEXTO 1: El ciclo de la vida (Biología) (Continuación)",
+                pregunta: "2. ¿Qué se puede deducir sobre el entorno de vida de las ranas?",
                 opciones: [
                     { texto: "Los renacuajos son más rápidos que las ranas adultas.", correcta: false },
                     { texto: "La metamorfosis ocurre solo en climas fríos.", correcta: false },
@@ -604,10 +611,8 @@
                 ]
             },
             {
-                num: 3,
-                nivel: "Nivel 3",
-                tema: "TEXTO 2: El Nilo y Egipto (Historia)",
-                pregunta: "3. ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos? *",
+                num: 3, nivel: "Nivel 3", tema: "TEXTO 2: El Nilo y Egipto (Historia)",
+                pregunta: "3. ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos?",
                 opciones: [
                     { texto: "La construcción de las grandes pirámides de piedra.", correcta: false },
                     { texto: "La creación de canales de navegación rápidos.", correcta: false },
@@ -616,10 +621,8 @@
                 ]
             },
             {
-                num: 4,
-                nivel: "Nivel 4",
-                tema: "TEXTO 2: El Nilo y Egipto (Historia) (Continuación)",
-                pregunta: "4. ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia? *",
+                num: 4, nivel: "Nivel 4", tema: "TEXTO 2: El Nilo y Egipto (Historia) (Continuación)",
+                pregunta: "4. ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia?",
                 opciones: [
                     { texto: "Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.", correcta: false },
                     { texto: "Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.", correcta: true },
@@ -628,10 +631,8 @@
                 ]
             },
             {
-                num: 5,
-                nivel: "Nivel 5",
-                tema: "TEXTO 3: El uso de la tecnología (Sociedad)",
-                pregunta: "5. ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar? *",
+                num: 5, nivel: "Nivel 5", tema: "TEXTO 3: El uso de la tecnología (Sociedad)",
+                pregunta: "5. ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar?",
                 opciones: [
                     { texto: "La luz azul mejora la memoria a largo plazo.", correcta: false },
                     { texto: "No existe ninguna relación; el cansancio es solo una excusa.", correcta: false },
@@ -640,10 +641,8 @@
                 ]
             },
             {
-                num: 6,
-                nivel: "Nivel 6",
-                tema: "TEXTO 3: El uso de la tecnología (Sociedad) (Continuación)",
-                pregunta: "6. ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir? *",
+                num: 6, nivel: "Nivel 6", tema: "TEXTO 3: El uso de la tecnología (Sociedad) (Continuación)",
+                pregunta: "6. ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir?",
                 opciones: [
                     { texto: "Promueve el uso de dispositivos como una forma de relajación.", correcta: false },
                     { texto: "Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.", correcta: true },
@@ -652,10 +651,8 @@
                 ]
             },
             {
-                num: 7,
-                nivel: "Nivel 7",
-                tema: "TEXTO 4: La semilla ambiciosa (Fábula)",
-                pregunta: "7. ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca? *",
+                num: 7, nivel: "Nivel 7", tema: "TEXTO 4: La semilla ambiciosa (Fábula)",
+                pregunta: "7. ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca?",
                 opciones: [
                     { texto: "Se quedó quieta esperando que lloviera.", correcta: false },
                     { texto: "Intentó buscar agua en las profundidades de la tierra.", correcta: true },
@@ -664,10 +661,8 @@
                 ]
             },
             {
-                num: 8,
-                nivel: "Nivel 8",
-                tema: "TEXTO 4: La semilla ambiciosa (Fábula) (Continuación)",
-                pregunta: "8. ¿Qué representa la acción de la semilla en esta historia? *",
+                num: 8, nivel: "Nivel 8", tema: "TEXTO 4: La semilla ambiciosa (Fábula) (Continuación)",
+                pregunta: "8. ¿Qué representa la acción de la semilla en esta historia?",
                 opciones: [
                     { texto: "La importancia de la suerte en la vida.", correcta: false },
                     { texto: "La necesidad de adaptarse y esforzarse para superar las dificultades.", correcta: true },
@@ -676,10 +671,8 @@
                 ]
             },
             {
-                num: 9,
-                nivel: "Nivel 9",
-                tema: "Exploración espacial (Ciencia)",
-                pregunta: "9. ¿Por qué la exploración de Marte es un tema de debate? *",
+                num: 9, nivel: "Nivel 9", tema: "Exploración espacial (Ciencia)",
+                pregunta: "9. ¿Por qué la exploración de Marte es un tema de debate?",
                 opciones: [
                     { texto: "Porque no hay evidencia de que Marte sea un planeta interesante.", correcta: false },
                     { texto: "Porque los científicos no quieren cooperar entre sí.", correcta: false },
@@ -688,10 +681,8 @@
                 ]
             },
             {
-                num: 10,
-                nivel: "Nivel 10",
-                tema: "Exploración espacial (Ciencia) (Continuación)",
-                pregunta: "10. ¿Cuál es el dilema principal que plantea el texto? *",
+                num: 10, nivel: "Nivel 10", tema: "Exploración espacial (Ciencia) (Continuación)",
+                pregunta: "10. ¿Cuál es el dilema principal que plantea el texto?",
                 opciones: [
                     { texto: "La tecnología actual es incapaz de llegar a Marte.", correcta: false },
                     { texto: "La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.", correcta: true },
@@ -701,6 +692,7 @@
             }
         ];
 
+        // --- VARIABLES DE ESTADO ---
         let studentName = "";
         let indicePregunta = 0;
         let puntajeTotal = 0;
@@ -709,16 +701,115 @@
 
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwLnNXJmQDhg_nVjV7CGPzdAU5V2gfCpQXx_UqSDWHkXQgkrPLIYbp1wDMNwlg-EOVlZw/exec";
 
+        // --- MOTOR 3D CON THREE.JS (ESCALERAS E ISLAS FLOTANTES) ---
+        let scene, camera, renderer, playerGroup;
+        const escalonesMeshes = [];
+
+        function init3D() {
+            const container = document.getElementById('canvas3d-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x07132b);
+            scene.fog = new THREE.FogExp2(0x07132b, 0.025);
+
+            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(-8, 5, 12);
+            camera.lookAt(0, 2, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Luces
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+            const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
+            dirLight.position.set(10, 20, 10);
+            scene.add(dirLight);
+
+            // Construir Escalera de 10 peldaños
+            for (let i = 0; i < 10; i++) {
+                const stepGeo = new THREE.BoxGeometry(1.6, 0.4, 1.2);
+                const stepMat = new THREE.MeshStandardMaterial({ 
+                    color: i === 0 ? 0x10b981 : 0x334155, 
+                    roughness: 0.4 
+                });
+                const step = new THREE.Mesh(stepGeo, stepMat);
+                
+                // Posición escalonada en pendiente
+                step.position.set(i * 0.9 - 3.5, i * 0.5 - 1.5, 0);
+                scene.add(step);
+                escalonesMeshes.push(step);
+
+                // Estrella flotante decorativa en cada escalón
+                const starGeo = new THREE.OctahedronGeometry(0.2);
+                const starMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xf59e0b });
+                const star = new THREE.Mesh(starGeo, starMat);
+                star.position.set(i * 0.9 - 3.5, i * 0.5 - 0.8, 0);
+                scene.add(star);
+            }
+
+            // Crear Avatar del Estudiante (Cubo con mochila y cabeza estilizada)
+            playerGroup = new THREE.Group();
+            
+            // Cuerpo
+            const bodyGeo = new THREE.BoxGeometry(0.5, 0.7, 0.3);
+            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0066ff });
+            const body = new THREE.Mesh(bodyGeo, bodyMat);
+            body.position.y = 0.35;
+            playerGroup.add(body);
+
+            // Mochila
+            const bagGeo = new THREE.BoxGeometry(0.3, 0.4, 0.2);
+            const bagMat = new THREE.MeshStandardMaterial({ color: 0xf97316 });
+            const bag = new THREE.Mesh(bagGeo, bagMat);
+            bag.position.set(0, 0.35, -0.25);
+            playerGroup.add(bag);
+
+            // Cabeza
+            const headGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+            const headMat = new THREE.MeshStandardMaterial({ color: 0xfbcfe8 });
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.position.y = 0.85;
+            playerGroup.add(head);
+
+            // Posición inicial en el escalón 0
+            playerGroup.position.set(-3.5, -1.1, 0);
+            scene.add(playerGroup);
+
+            animate3D();
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            renderer.render(scene, camera);
+        }
+
+        function actualizarAvatar3D(nivelActual) {
+            if (nivelActual < 10) {
+                const targetX = (nivelActual * 0.9) - 3.5;
+                const targetY = (nivelActual * 0.5) - 1.1;
+                playerGroup.position.set(targetX, targetY, 0);
+
+                // Colorear escalones completados
+                for(let i=0; i<=nivelActual; i++) {
+                    if(escalonesMeshes[i]) escalonesMeshes[i].material.color.setHex(0x10b981);
+                }
+            }
+        }
+
+        // --- CONTROL DEL FLUJO DEL JUEGO ---
         function iniciarEvaluacion() {
             studentName = document.getElementById('student-name').value.trim();
             if(!studentName) {
-                alert("Por favor, ingresa tu nombre para comenzar.");
+                alert("Por favor, ingresa tu nombre completo para comenzar.");
                 return;
             }
 
             document.getElementById('modal-register').style.display = 'none';
             document.getElementById('question-card').style.display = 'block';
             
+            init3D();
             cargarPregunta();
         }
 
@@ -734,12 +825,12 @@
             document.getElementById('lbl-topic').innerText = q.tema;
             document.getElementById('lbl-question-title').innerText = q.pregunta;
 
+            // Aleatorizar opciones para cada equipo
             let opcionesMezcladas = [...q.opciones];
             opcionesMezcladas.sort(() => Math.random() - 0.5);
 
             const container = document.getElementById('options-container');
             container.innerHTML = "";
-
             const letras = ['A', 'B', 'C', 'D'];
 
             opcionesMezcladas.forEach((op, index) => {
@@ -769,23 +860,45 @@
             }
 
             const qActual = bancoPreguntas[indicePregunta];
+            const overlay = document.getElementById('feedback-overlay');
+            const icon = document.getElementById('fb-icon');
+            const title = document.getElementById('fb-title');
+            const sub = document.getElementById('fb-sub');
 
             if(opcionSeleccionada.correcta) {
                 puntajeTotal += 10;
                 resultadosEstudiante[`q${qActual.num}`] = "✅";
                 document.getElementById('hud-score').innerText = puntajeTotal;
-                confetti({ particleCount: 70, spread: 60, origin: { y: 0.7 } });
+                
+                // Notificación visual de Acierto
+                icon.innerText = "🎉";
+                title.innerText = "¡Respuesta Correcta!";
+                title.style.color = "#34d399";
+                sub.innerText = "+10 Puntos | ¡Subes un escalón en la montaña!";
+                overlay.style.display = "flex";
+
+                confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
+                actualizarAvatar3D(indicePregunta + 1);
             } else {
                 resultadosEstudiante[`q${qActual.num}`] = "❌";
+                
+                // Notificación visual de Fallo
+                icon.innerText = "❌";
+                title.innerText = "Respuesta Incorrecta";
+                title.style.color = "#f87171";
+                sub.innerText = "No sumas puntos en este escalón.";
+                overlay.style.display = "flex";
             }
 
-            indicePregunta++;
-
-            if(indicePregunta < bancoPreguntas.length) {
-                cargarPregunta();
-            } else {
-                finalizarJuego();
-            }
+            setTimeout(() => {
+                overlay.style.display = "none";
+                indicePregunta++;
+                if(indicePregunta < bancoPreguntas.length) {
+                    cargarPregunta();
+                } else {
+                    finalizarJuego();
+                }
+            }, 1600);
         }
 
         function finalizarJuego() {
@@ -807,6 +920,7 @@
             document.getElementById('final-score-text').innerText = `Puntaje Final: ${puntajeTotal} / 100 Puntos (${puntajeTotal}%)`;
             document.getElementById('final-badge').innerText = insigniaFinal;
 
+            // Envío automático al Web App de Google Sheets
             const datos = {
                 fecha: new Date().toLocaleString(),
                 nombre: studentName,
