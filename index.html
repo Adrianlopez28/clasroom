@@ -470,17 +470,19 @@
 
 <script>
 let studentName = "";
-let resultadosEstudiante = {};
+let resultadosEstudiante = {
+    q1: "❌", q2: "❌", q3: "❌", q4: "❌", q5: "❌",
+    q6: "❌", q7: "❌", q8: "❌", q9: "❌", q10: "❌"
+};
 let puntajeTotal = 0;
-let escalonActual = 0; // Inicia en 0 (base)
+let escalonActual = 0;
 
 // Motor Gráfico Canvas
 let canvas, ctx;
 let playerX = 40;
 let playerY = 160;
 
-// REEMPLAZA ESTA URL CON TU ENLACE DE GOOGLE APPS SCRIPT
-const WEB_APP_URL = "AQUÍ_PEGA_TU_URL_DE_GOOGLE_APPS_SCRIPT";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby3XmV5O4dJZC8klxjWljKXxO3mlZx8RLNsaMFeX0WvrIzoUNjgGwPQuHyvRp5jE5zCyw/exec";
 
 function iniciarEvaluacion() {
     studentName = document.getElementById('student-name').value.trim();
@@ -538,10 +540,8 @@ function procesarRespuesta(numQ, nivelCognitivo) {
 
     const esCorrecta = seleccionada.getAttribute('data-correct') === 'true';
     
-    // Guardar si es el primer intento
-    if(!resultadosEstudiante[`q${numQ}`]) {
-        resultadosEstudiante[`q${numQ}`] = esCorrecta ? "✔️ Correcta" : "❌ Incorrecta";
-    }
+    // Asignar el chulo verde (✅) o cruz roja (❌) por cada pregunta
+    resultadosEstudiante[`q${numQ}`] = esCorrecta ? "✅" : "❌";
 
     const overlay = document.getElementById('feedback-overlay');
     const emoji = document.getElementById('fb-emoji');
@@ -573,7 +573,6 @@ function procesarRespuesta(numQ, nivelCognitivo) {
         }, 1600);
 
     } else {
-        // Respuesta incorrecta: NO avanza, NO suma puntos y pasa directamente
         emoji.innerText = "❌";
         title.innerText = "Respuesta Incorrecta";
         sub.innerText = "No sumas puntos ni recoges el libro en este escalón.";
@@ -605,46 +604,37 @@ function dibujarEscenario() {
     if(!ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Fondo con estrellas sutiles
     ctx.fillStyle = "#020617";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Dibujar 10 Escalones/Plataformas con estilo mejorado 3D
     for(let i = 0; i < 10; i++) {
         let x = 25 + (i * 64);
         let y = 175 - (i * 13);
 
-        // Sombra de la plataforma
         ctx.fillStyle = "#0f172a";
         ctx.fillRect(x + 2, y + 4, 58, 10);
 
-        // Cuerpo de la plataforma (Color según estado)
         ctx.fillStyle = (i < escalonActual) ? "#10b981" : "#475569";
         ctx.fillRect(x, y, 58, 8);
 
-        // Brillo superior de la plataforma
         ctx.fillStyle = (i < escalonActual) ? "#34d399" : "#64748b";
         ctx.fillRect(x, y, 58, 2);
 
-        // Pilar conector vertical estilo arcade
         if(i < 9) {
             ctx.fillStyle = "#334155";
             ctx.fillRect(x + 46, y - 13, 6, 13);
         }
 
-        // Dibujar un libro o estrella coleccionable en cada escalón que AÚN NO ha sido alcanzado
         if (i >= escalonActual) {
             let itemX = x + 25;
             let itemY = y - 8;
 
             if (i % 2 === 0) {
-                // Dibujar mini libro coleccionable
                 ctx.fillStyle = "#38bdf8";
                 ctx.fillRect(itemX, itemY, 8, 6);
                 ctx.fillStyle = "#ffffff";
                 ctx.fillRect(itemX + 2, itemY + 1, 4, 4);
             } else {
-                // Dibujar estrella coleccionable
                 ctx.fillStyle = "#f59e0b";
                 ctx.fillRect(itemX + 2, itemY, 4, 6);
                 ctx.fillRect(itemX, itemY + 2, 8, 2);
@@ -652,11 +642,9 @@ function dibujarEscenario() {
         }
     }
 
-    // Dibujar Cima (Libro Abierto con Trofeo)
     let cimaX = 25 + (10 * 64) - 15;
     let cimaY = 175 - (10 * 13) + 2;
 
-    // Libro abierto (base)
     ctx.fillStyle = "#e2e8f0";
     ctx.beginPath();
     ctx.moveTo(cimaX, cimaY);
@@ -665,43 +653,35 @@ function dibujarEscenario() {
     ctx.lineTo(cimaX + 18, cimaY + 4);
     ctx.fill();
 
-    // Páginas del libro
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(cimaX + 2, cimaY - 4, 14, 6);
     ctx.fillRect(cimaX + 20, cimaY - 4, 14, 6);
 
-    // Trofeo en la cima
-    ctx.fillStyle = "#f59e0b"; // Oro
+    ctx.fillStyle = "#f59e0b";
     ctx.fillRect(cimaX + 15, cimaY - 18, 6, 12);
     ctx.fillRect(cimaX + 12, cimaY - 20, 12, 3);
     ctx.fillStyle = "#d97706";
     ctx.fillRect(cimaX + 17, cimaY - 6, 2, 4);
     ctx.fillRect(cimaX + 13, cimaY - 2, 10, 2);
 
-    // Dibujar Avatar Mejorado (Estudiante tipo Pixel Art)
     let avX = playerX;
     let avY = playerY - (escalonActual * 13);
 
-    // Sombra del avatar
     ctx.fillStyle = "rgba(0,0,0,0.4)";
     ctx.fillRect(avX + 2, avY + 18, 14, 4);
 
-    // Cuerpo / Ropa (Camiseta Azul Brillante)
     ctx.fillStyle = "#38bdf8";
     ctx.fillRect(avX + 2, avY + 4, 12, 12);
 
-    // Mochila (Detalle trasero)
     ctx.fillStyle = "#f97316";
     ctx.fillRect(avX - 1, avY + 6, 4, 9);
 
-    // Cabeza (Tono de piel)
     ctx.fillStyle = "#fbcfe8";
     ctx.fillRect(avX + 3, avY - 3, 10, 8);
 
-    // Gorro / Pelo estilizado
     ctx.fillStyle = "#ef4444";
     ctx.fillRect(avX + 2, avY - 6, 12, 4);
-    ctx.fillRect(avX + 10, avY - 8, 6, 3); // Visera
+    ctx.fillRect(avX + 10, avY - 8, 6, 3);
 }
 
 function finalizarEvaluacion() {
@@ -711,25 +691,33 @@ function finalizarEvaluacion() {
     if(puntajeTotal >= 30) badges.push("Crítico Maestro");
     if(puntajeTotal === 100) badges.push("Leyenda de la Comprensión Lectora");
 
+    let porcentajeIndividual = `${puntajeTotal}%`;
+
     cambiarPaso('success');
-    document.getElementById('score-text').innerText = `Estudiante: ${studentName}\nPuntaje Final: ${puntajeTotal} / 100 Puntos`;
+    document.getElementById('score-text').innerText = `Estudiante: ${studentName}\nPuntaje Final: ${puntajeTotal} / 100 Puntos (${porcentajeIndividual})`;
 
     let badgeHtml = '';
     badges.forEach(b => { badgeHtml += `<div class="badge">🏆 ${b}</div>`; });
     document.getElementById('badges-list').innerHTML = badgeHtml;
 
-    // Enviar datos al Google Sheets mediante Google Apps Script
+    // Estructura de datos individualizada por pregunta para Google Sheets
     const datos = {
+        fecha: new Date().toLocaleString(),
         nombre: studentName,
         puntaje: puntajeTotal,
+        porcentaje: porcentajeIndividual,
         insignias: badges.join(", "),
-        respuestas: resultadosEstudiante
+        q1: resultadosEstudiante.q1,
+        q2: resultadosEstudiante.q2,
+        q3: resultadosEstudiante.q3,
+        q4: resultadosEstudiante.q4,
+        q5: resultadosEstudiante.q5,
+        q6: resultadosEstudiante.q6,
+        q7: resultadosEstudiante.q7,
+        q8: resultadosEstudiante.q8,
+        q9: resultadosEstudiante.q9,
+        q10: resultadosEstudiante.q10
     };
-
-    if(WEB_APP_URL.includes("AQUÍ_PEGA_TU_URL")) {
-        document.getElementById('status-envio').innerText = "⚠️ Falta configurar la URL de Google Apps Script.";
-        return;
-    }
 
     fetch(WEB_APP_URL, {
         method: "POST",
@@ -738,7 +726,7 @@ function finalizarEvaluacion() {
         body: JSON.stringify(datos)
     })
     .then(() => {
-        document.getElementById('status-envio').innerText = "✅ ¡Resultados enviados al docente con éxito!";
+        document.getElementById('status-envio').innerText = "✅ ¡Resultados detallados enviados al docente con éxito!";
     })
     .catch((error) => {
         console.error("Error al enviar:", error);
