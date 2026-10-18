@@ -33,7 +33,6 @@
             overflow-x: hidden;
         }
 
-        /* --- BARRA SUPERIOR (HEADER HUD) --- */
         header {
             background: rgba(3, 12, 34, 0.95);
             padding: 12px 30px;
@@ -121,29 +120,30 @@
             font-weight: 600;
         }
 
-        /* --- CONTENEDOR PRINCIPAL DEL JUEGO --- */
         .game-viewport {
             flex: 1;
             position: relative;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 4%;
+            padding: 20px 3%;
             min-height: 600px;
             gap: 20px;
         }
 
-        /* ESCENARIO 2D CON EL PERSONAJE 🧍 Y LAS ESTRELLAS ⭐ */
+        /* Contenedor Izquierdo con la imagen JUEGO.png de fondo */
         .scenery-canvas-container {
             flex: 1;
-            max-width: 500px;
-            height: 480px;
-            background: rgba(15, 23, 42, 0.6);
-            border: 2px solid rgba(56, 189, 248, 0.3);
+            max-width: 520px;
+            height: 520px;
+            background-image: url('JUEGO.png');
+            background-size: cover;
+            background-position: center;
+            border: 2px solid rgba(56, 189, 248, 0.4);
             border-radius: 20px;
             position: relative;
             overflow: hidden;
-            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
         }
 
         canvas {
@@ -152,7 +152,6 @@
             display: block;
         }
 
-        /* REGISTRO DE ESTUDIANTE */
         .modal-register {
             position: absolute;
             top: 50%;
@@ -182,7 +181,6 @@
             outline: none;
         }
 
-        /* --- TARJETA DE PREGUNTA DERECHA --- */
         .question-container {
             width: 100%;
             max-width: 540px;
@@ -249,6 +247,8 @@
             padding: 20px 25px;
             background: #ffffff;
             color: #0f172a;
+            max-height: 350px;
+            overflow-y: auto;
         }
 
         .topic-pill {
@@ -259,21 +259,32 @@
             font-size: 0.8rem;
             padding: 5px 12px;
             border-radius: 20px;
+            margin-bottom: 10px;
+        }
+
+        .context-box {
+            font-size: 0.85rem;
+            line-height: 1.4;
+            color: #334155;
             margin-bottom: 12px;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #0066ff;
         }
 
         .question-title {
-            font-size: 1.05rem;
+            font-size: 0.98rem;
             font-weight: 800;
             line-height: 1.4;
             color: #0f172a;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
 
         .options-list {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .option-item {
@@ -281,8 +292,8 @@
             align-items: center;
             background: #f8fafc;
             border: 2px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 10px 14px;
+            border-radius: 12px;
+            padding: 8px 12px;
             cursor: pointer;
             transition: all 0.2s ease;
         }
@@ -299,8 +310,8 @@
         }
 
         .option-letter {
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: #0066ff;
             color: white;
@@ -308,29 +319,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
+            margin-right: 10px;
             flex-shrink: 0;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .option-text {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
             color: #1e293b;
             flex: 1;
         }
 
         .option-check {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: #0284c7;
             color: white;
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
-            margin-left: 10px;
+            font-size: 0.7rem;
+            margin-left: 8px;
         }
 
         .option-item.selected .option-check {
@@ -338,7 +349,7 @@
         }
 
         .card-footer {
-            padding: 16px 25px;
+            padding: 14px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -358,9 +369,9 @@
             background: linear-gradient(135deg, #0066ff, #0044cc);
             color: white;
             border: none;
-            padding: 12px 28px;
+            padding: 10px 24px;
             border-radius: 30px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 800;
             cursor: pointer;
             box-shadow: 0 6px 20px rgba(0, 102, 255, 0.5);
@@ -372,7 +383,6 @@
             filter: brightness(1.15);
         }
 
-        /* MODAL DE NOTIFICACIÓN DE RESPUESTA (ACIERTO / FALLO) */
         .feedback-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -396,7 +406,6 @@
         .feedback-title { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; }
         .feedback-sub { font-size: 0.95rem; color: #94a3b8; }
 
-        /* MODAL DE RESULTADOS FINALES */
         .modal-success {
             display: none;
             background: rgba(7, 24, 56, 0.95);
@@ -423,7 +432,6 @@
             display: inline-block;
         }
 
-        /* --- FOOTER INFORMATIVO --- */
         footer {
             background: rgba(3, 12, 34, 0.95);
             padding: 15px 5%;
@@ -449,7 +457,6 @@
 </head>
 <body>
 
-    <!-- BARRA SUPERIOR HUD -->
     <header>
         <div class="logo-area">
             <div class="logo-icon">📖</div>
@@ -491,23 +498,20 @@
         </div>
     </header>
 
-    <!-- ESCENARIO PRINCIPAL -->
     <main class="game-viewport" id="viewport">
 
-        <!-- Contenedor del Escenario Gráfico con el Niños 🧍 y Estrellas ⭐ -->
+        <!-- Contenedor con la imagen JUEGO.png de fondo y el personaje escalando -->
         <div class="scenery-canvas-container" id="scenery-container">
-            <canvas id="gameCanvas" width="500" height="480"></canvas>
+            <canvas id="gameCanvas" width="520" height="520"></canvas>
         </div>
 
-        <!-- REGISTRO DE ESTUDIANTE -->
         <div class="modal-register" id="modal-register">
             <h2>¡Bienvenido Explorador! 🚀</h2>
-            <p style="color: #94a3b8; margin-bottom: 20px;">Ingresa tu nombre completo para comenzar el ascenso en La Escalera del Saber.</p>
-            <input type="text" id="student-name" placeholder="Ej. Luis Mario Epieyu" autocomplete="off">
+            <p style="color: #94a3b8; margin-bottom: 20px;">Ingresa tu correo electrónico para comenzar la prueba final.</p>
+            <input type="text" id="student-name" placeholder="Correo electrónico *" autocomplete="off">
             <button class="btn-next" style="width: 100%; justify-content: center;" onclick="iniciarEvaluacion()">Comenzar Aventura ➔</button>
         </div>
 
-        <!-- TARJETA DE PREGUNTA EN JUEGO (LADO DERECHO) -->
         <div class="question-container" id="question-card">
             <div class="card-header">
                 <div class="level-badge">
@@ -522,19 +526,18 @@
             </div>
 
             <div class="card-body">
-                <div class="topic-pill" id="lbl-topic">TEXTO 1: El ciclo de la vida (Biología)</div>
-                <div class="question-title" id="lbl-question-title">1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *</div>
+                <div class="topic-pill" id="lbl-topic">Texto 1</div>
+                <div class="context-box" id="lbl-context"></div>
+                <div class="question-title" id="lbl-question-title"></div>
 
-                <div class="options-list" id="options-container">
-                    <!-- Opciones generadas dinámicamente -->
-                </div>
+                <div class="options-list" id="options-container"></div>
             </div>
 
             <div class="card-footer">
                 <div class="motivation-text">
                     <span style="font-size: 1.5rem;">⭐</span>
                     <div>
-                        <strong>¡Excelente!</strong><br>
+                        <strong>10 puntos</strong><br>
                         Cada respuesta te acerca a la meta.
                     </div>
                 </div>
@@ -542,7 +545,6 @@
             </div>
         </div>
 
-        <!-- MODAL DE RESULTADOS FINALES -->
         <div class="modal-success" id="modal-success">
             <h2 style="color: #38bdf8; margin-bottom: 10px;">¡Felicidades! Has llegado a la cima 🏆</h2>
             <p id="final-student-name" style="color: white; font-weight: 700; font-size: 1.1rem;"></p>
@@ -555,16 +557,14 @@
 
     </main>
 
-    <!-- VENTANA DE NOTIFICACIÓN DE RESPUESTA -->
     <div class="feedback-overlay" id="feedback-overlay">
         <div class="feedback-box">
             <div class="feedback-icon" id="fb-icon">🎉</div>
             <div class="feedback-title" id="fb-title" style="color: #38bdf8;">¡Respuesta Correcta!</div>
-            <div class="feedback-sub" id="fb-sub">+10 Puntos | ¡Sumas una estrella y subes de escalón!</div>
+            <div class="feedback-sub" id="fb-sub">+10 Puntos | ¡Sumas una estrella y el niño 🧍 sube al siguiente escalón!</div>
         </div>
     </div>
 
-    <!-- PIE DE PÁGINA -->
     <footer>
         <div class="footer-item">
             <div class="footer-icon">📖</div>
@@ -597,11 +597,11 @@
     </footer>
 
     <script>
-        // --- BASE DE DATOS DE LAS 10 PREGUNTAS ---
         const bancoPreguntas = [
             {
-                num: 1, nivel: "Nivel 1", tema: "TEXTO 1: El ciclo de la vida (Biología)",
-                pregunta: "1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas?",
+                num: 1, nivel: "Nivel Literal", tema: "Texto 1: El ciclo de la vida (Biología)",
+                contexto: "Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente y comienzan a desarrollar pulmones. Finalmente, emergen a la tierra como ranas adultas, listas para explorar un mundo nuevo fuera del agua.",
+                pregunta: "¿Qué característica de los renacuajos cambia al convertirse en ranas adultas?",
                 opciones: [
                     { texto: "Comienzan a caminar sobre el agua.", correcta: false },
                     { texto: "Sus pulmones desaparecen.", correcta: false },
@@ -610,18 +610,20 @@
                 ]
             },
             {
-                num: 2, nivel: "Nivel 2", tema: "TEXTO 1: El ciclo de la vida (Biología) (Continuación)",
-                pregunta: "2. ¿Qué se puede deducir sobre el entorno de vida de las ranas?",
+                num: 2, nivel: "Nivel Inferencial", tema: "Texto 1: El ciclo de la vida (Biología) (Continuación)",
+                contexto: "Continuación del Texto 1",
+                pregunta: "¿Qué se puede deducir sobre el entorno de vida de las ranas?",
                 opciones: [
-                    { texto: "Los renacuajos son más rápidos que las ranas adultas.", correcta: false },
-                    { texto: "La metamorfosis ocurre solo en climas fríos.", correcta: false },
                     { texto: "Solo pueden vivir en entornos húmedos debido a su piel.", correcta: false },
-                    { texto: "Son animales que necesitan adaptarse a dos medios distintos durante su vida.", correcta: true }
+                    { texto: "Son animales que necesitan adaptarse a dos medios distintos durante su vida.", correcta: true },
+                    { texto: "Los renacuajos son más rápidos que las ranas adultas.", correcta: false },
+                    { texto: "La metamorfosis ocurre solo en climas fríos.", correcta: false }
                 ]
             },
             {
-                num: 3, nivel: "Nivel 3", tema: "TEXTO 2: El Nilo y Egipto (Historia)",
-                pregunta: "3. ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos?",
+                num: 3, nivel: "Nivel Literal", tema: "Texto 2: El Nilo y Egipto (Historia)",
+                contexto: "El Antiguo Egipto no habría sido la civilización esplendorosa que conocemos sin el río Nilo. Cada año, el río se desbordaba, cubriendo las tierras circundantes con un lodo fértil que permitía el cultivo de trigo y cebada. Los egipcios aprendieron a controlar estas crecidas mediante canales de riego, lo que les permitió tener excedentes de comida, tiempo para construir pirámides y desarrollar una sociedad compleja.",
+                pregunta: "¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos?",
                 opciones: [
                     { texto: "La construcción de las grandes pirámides de piedra.", correcta: false },
                     { texto: "La creación de canales de navegación rápidos.", correcta: false },
@@ -630,8 +632,9 @@
                 ]
             },
             {
-                num: 4, nivel: "Nivel 4", tema: "TEXTO 2: El Nilo y Egipto (Historia) (Continuación)",
-                pregunta: "4. ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia?",
+                num: 4, nivel: "Nivel Crítico", tema: "Texto 2: El Nilo y Egipto (Historia) (Continuación)",
+                contexto: "Continuación del Texto 2",
+                pregunta: "¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia?",
                 opciones: [
                     { texto: "Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.", correcta: false },
                     { texto: "Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.", correcta: true },
@@ -640,8 +643,9 @@
                 ]
             },
             {
-                num: 5, nivel: "Nivel 5", tema: "TEXTO 3: El uso de la tecnología (Sociedad)",
-                pregunta: "5. ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar?",
+                num: 5, nivel: "Nivel Inferencial", tema: "Texto 3: El uso de la tecnología (Sociedad)",
+                contexto: "El uso excesivo de dispositivos electrónicos antes de dormir se ha convertido en una preocupación de salud pública. La luz azul emitida por las pantallas engaña a nuestro cerebro haciéndole creer que aún es de día, lo que inhibe la producción de melatonina, la hormona encargada de inducir el sueño. Como resultado, muchos jóvenes reportan fatiga, falta de concentración en clases y mal humor durante el día.",
+                pregunta: "¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar?",
                 opciones: [
                     { texto: "La luz azul mejora la memoria a largo plazo.", correcta: false },
                     { texto: "No existe ninguna relación; el cansancio es solo una excusa.", correcta: false },
@@ -650,8 +654,9 @@
                 ]
             },
             {
-                num: 6, nivel: "Nivel 6", tema: "TEXTO 3: El uso de la tecnología (Sociedad) (Continuación)",
-                pregunta: "6. ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir?",
+                num: 6, nivel: "Nivel Crítico", tema: "Texto 3: El uso de la tecnología (Sociedad) (Continuación)",
+                contexto: "Continuación del Texto 3",
+                pregunta: "¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir?",
                 opciones: [
                     { texto: "Promueve el uso de dispositivos como una forma de relajación.", correcta: false },
                     { texto: "Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.", correcta: true },
@@ -660,8 +665,9 @@
                 ]
             },
             {
-                num: 7, nivel: "Nivel 7", tema: "TEXTO 4: La semilla ambiciosa (Fábula)",
-                pregunta: "7. ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca?",
+                num: 7, nivel: "Nivel Literal", tema: "Texto 4: La semilla ambiciosa (Fábula)",
+                contexto: "Una pequeña semilla cayó en tierra seca y dura. A su alrededor, las otras semillas se quejaban de la falta de agua, pero esta semilla decidió abrirse camino buscando las profundidades de la tierra, donde sabía que encontraría humedad. Años después, mientras las otras semillas habían desaparecido, aquella pequeña semilla se había convertido en un robusto árbol cuyas raíces profundas sostenían todo el jardín.",
+                pregunta: "¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca?",
                 opciones: [
                     { texto: "Se quedó quieta esperando que lloviera.", correcta: false },
                     { texto: "Intentó buscar agua en las profundidades de la tierra.", correcta: true },
@@ -670,8 +676,9 @@
                 ]
             },
             {
-                num: 8, nivel: "Nivel 8", tema: "TEXTO 4: La semilla ambiciosa (Fábula) (Continuación)",
-                pregunta: "8. ¿Qué representa la acción de la semilla en esta historia?",
+                num: 8, nivel: "Nivel Inferencial", tema: "Texto 4: La semilla ambiciosa (Fábula) (Continuación)",
+                contexto: "Continuación del Texto 4",
+                pregunta: "¿Qué representa la acción de la semilla en esta historia?",
                 opciones: [
                     { texto: "La importancia de la suerte en la vida.", correcta: false },
                     { texto: "La necesidad de adaptarse y esforzarse para superar las dificultades.", correcta: true },
@@ -680,8 +687,9 @@
                 ]
             },
             {
-                num: 9, nivel: "Nivel 9", tema: "Exploración espacial (Ciencia)",
-                pregunta: "9. ¿Por qué la exploración de Marte es un tema de debate?",
+                num: 9, nivel: "Nivel Inferencial", tema: "Exploración espacial (Ciencia)",
+                contexto: "La exploración de Marte ha sido un sueño de la humanidad durante décadas. Los científicos argumentan que estudiar el planeta rojo podría revelar si alguna vez hubo vida allí o si, en el futuro, los humanos podrían habitarlo. Sin embargo, este proceso es extremadamente costoso y requiere una cooperación internacional sin precedentes, lo que genera debates sobre si ese dinero debería invertirse primero en solucionar problemas de la Tierra.",
+                pregunta: "¿Por qué la exploración de Marte es un tema de debate?",
                 opciones: [
                     { texto: "Porque no hay evidencia de que Marte sea un planeta interesante.", correcta: false },
                     { texto: "Porque los científicos no quieren cooperar entre sí.", correcta: false },
@@ -690,8 +698,9 @@
                 ]
             },
             {
-                num: 10, nivel: "Nivel 10", tema: "Exploración espacial (Ciencia) (Continuación)",
-                pregunta: "10. ¿Cuál es el dilema principal que plantea el texto?",
+                num: 10, nivel: "Nivel Crítico", tema: "Exploración espacial (Ciencia) (Continuación)",
+                contexto: "Continuación del texto de Exploración espacial",
+                pregunta: "¿Cuál es el dilema principal que plantea el texto?",
                 opciones: [
                     { texto: "La tecnología actual es incapaz de llegar a Marte.", correcta: false },
                     { texto: "La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.", correcta: true },
@@ -701,7 +710,6 @@
             }
         ];
 
-        // --- VARIABLES DE ESTADO ---
         let studentName = "";
         let indicePregunta = 0;
         let puntajeTotal = 0;
@@ -712,8 +720,22 @@
 
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwLnNXJmQDhg_nVjV7CGPzdAU5V2gfCpQXx_UqSDWHkXQgkrPLIYbp1wDMNwlg-EOVlZw/exec";
 
-        // --- MOTOR GRÁFICO 2D (EL NIÑO 🧍 SUBE LAS ESCALERAS Y SUMA ESTRELLAS ⭐) ---
         let canvas, ctx;
+
+        // Coordenadas exactas sobre los escalones de la imagen JUEGO.png
+        const coordenadasEscalones = [
+            { x: 300, y: 440 }, // Nivel 0 (Inicio)
+            { x: 380, y: 395 }, // Nivel 1
+            { x: 440, y: 345 }, // Nivel 2
+            { x: 445, y: 295 }, // Nivel 3
+            { x: 405, y: 255 }, // Nivel 4
+            { x: 350, y: 220 }, // Nivel 5
+            { x: 295, y: 190 }, // Nivel 6
+            { x: 285, y: 155 }, // Nivel 7
+            { x: 325, y: 130 }, // Nivel 8
+            { x: 385, y: 110 }, // Nivel 9
+            { x: 435, y: 80 }   // Nivel 10 (Cima)
+        ];
 
         function initCanvas() {
             canvas = document.getElementById('gameCanvas');
@@ -725,54 +747,25 @@
             if (!ctx) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Fondo espacial/nocturno
-            ctx.fillStyle = "#020617";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            let pos = coordenadasEscalones[Math.min(escalonActual, 10)];
 
-            // Dibujar 10 Escalones con profundidad
-            for (let i = 0; i < 10; i++) {
-                let x = 30 + (i * 42);
-                let y = 410 - (i * 35);
-
-                // Sombra
-                ctx.fillStyle = "#0f172a";
-                ctx.fillRect(x + 3, y + 4, 60, 16);
-
-                // Plataforma
-                ctx.fillStyle = (i < escalonActual) ? "#0066ff" : "#334155";
-                ctx.fillRect(x, y, 60, 12);
-
-                // Borde superior
-                ctx.fillStyle = (i < escalonActual) ? "#38bdf8" : "#64748b";
-                ctx.fillRect(x, y, 60, 3);
-            }
-
-            // Templo / Libro en la cima
-            let cimaX = 30 + (10 * 42) - 15;
-            let cimaY = 410 - (10 * 35) - 10;
+            // Dibujar al personaje 🧍 en el escalón actual
             ctx.font = "32px Segoe UI Symbol";
-            ctx.fillText("🏆", cimaX, cimaY);
+            ctx.textAlign = "center";
+            ctx.fillText("🧍", pos.x, pos.y);
 
-            // Dibujar al niño 🧍 en el escalón actual
-            let px = 30 + (escalonActual * 42) + 12;
-            let py = 410 - (escalonActual * 35) - 8;
-
-            ctx.font = "36px Segoe UI Symbol";
-            ctx.fillText("🧍", px, py);
-
-            // Dibujar las estrellas ⭐ ganadas que flotan sobre la cabeza del niño 🧍
+            // Dibujar las estrellas ⭐ acumuladas flotando arriba del personaje
             if (estrellasGanadas > 0) {
                 ctx.font = "16px Segoe UI Symbol";
-                let estrellasTexto = "⭐".repeat(Math.min(estrellasGanadas, 5));
-                ctx.fillText(estrellasTexto, px - 10, py - 38);
+                let textoEstrellas = "⭐".repeat(Math.min(estrellasGanadas, 6));
+                ctx.fillText(textoEstrellas, pos.x, pos.y - 32);
             }
         }
 
-        // --- CONTROL DEL FLUJO DEL JUEGO ---
         function iniciarEvaluacion() {
             studentName = document.getElementById('student-name').value.trim();
             if(!studentName) {
-                alert("Por favor, ingresa tu nombre completo para comenzar.");
+                alert("Por favor, ingresa tu correo electrónico para comenzar.");
                 return;
             }
 
@@ -793,9 +786,9 @@
             document.getElementById('progress-fill').style.width = `${(q.num / 10) * 100}%`;
 
             document.getElementById('lbl-topic').innerText = q.tema;
-            document.getElementById('lbl-question-title').innerText = q.pregunta;
+            document.getElementById('lbl-context').innerText = q.contexto;
+            document.getElementById('lbl-question-title').innerText = `${q.num}. ${q.pregunta}`;
 
-            // Aleatorizar opciones para cada equipo
             let opcionesMezcladas = [...q.opciones];
             opcionesMezcladas.sort(() => Math.random() - 0.5);
 
@@ -843,11 +836,10 @@
                 
                 document.getElementById('hud-score').innerText = puntajeTotal;
                 
-                // Notificación visual de Acierto
                 icon.innerText = "⭐";
                 title.innerText = "¡Respuesta Correcta!";
                 title.style.color = "#34d399";
-                sub.innerText = "+10 Puntos | ¡Sumas una estrella y el niño 🧍 sube de escalón!";
+                sub.innerText = "+10 Puntos | ¡Sumas una estrella y el niño 🧍 sube al siguiente escalón!";
                 overlay.style.display = "flex";
 
                 confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
@@ -855,7 +847,6 @@
             } else {
                 resultadosEstudiante[`q${qActual.num}`] = "❌";
                 
-                // Notificación visual de Fallo
                 icon.innerText = "❌";
                 title.innerText = "Respuesta Incorrecta";
                 title.style.color = "#f87171";
@@ -890,11 +881,10 @@
                 insigniaFinal = "📖 Novato de la Lectura (0-30 pts)";
             }
 
-            document.getElementById('final-student-name').innerText = `Estudiante: ${studentName}`;
+            document.getElementById('final-student-name').innerText = `Correo: ${studentName}`;
             document.getElementById('final-score-text').innerText = `Puntaje Final: ${puntajeTotal} / 100 Puntos (${puntajeTotal}%) - Estrellas: ${estrellasGanadas} ⭐`;
             document.getElementById('final-badge').innerText = insigniaFinal;
 
-            // Envío automático a Google Sheets
             const datos = {
                 fecha: new Date().toLocaleString(),
                 nombre: studentName,
