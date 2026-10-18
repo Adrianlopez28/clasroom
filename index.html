@@ -455,7 +455,7 @@
         <p id="score-text" style="font-size: 1.25rem; font-weight: 700; margin: 20px 0; color: #f8fafc;"></p>
         <h3 style="color: #94a3b8;">Insignias Obtenidas:</h3>
         <div class="badge-container" id="badges-list"></div>
-        <p style="margin-top: 30px; color: #34d399; font-weight: 700;" id="status-envio">Resultados listos</p>
+        <p style="margin-top: 30px; color: #34d399; font-weight: 700;" id="status-envio">Enviando resultados al docente...</p>
     </div>
 </div>
 
@@ -478,6 +478,9 @@ let escalonActual = 0; // Inicia en 0 (base)
 let canvas, ctx;
 let playerX = 40;
 let playerY = 160;
+
+// REEMPLAZA ESTA URL CON TU ENLACE DE GOOGLE APPS SCRIPT
+const WEB_APP_URL = "AQUÍ_PEGA_TU_URL_DE_GOOGLE_APPS_SCRIPT";
 
 function iniciarEvaluacion() {
     studentName = document.getElementById('student-name').value.trim();
@@ -714,6 +717,33 @@ function finalizarEvaluacion() {
     let badgeHtml = '';
     badges.forEach(b => { badgeHtml += `<div class="badge">🏆 ${b}</div>`; });
     document.getElementById('badges-list').innerHTML = badgeHtml;
+
+    // Enviar datos al Google Sheets mediante Google Apps Script
+    const datos = {
+        nombre: studentName,
+        puntaje: puntajeTotal,
+        insignias: badges.join(", "),
+        respuestas: resultadosEstudiante
+    };
+
+    if(WEB_APP_URL.includes("AQUÍ_PEGA_TU_URL")) {
+        document.getElementById('status-envio').innerText = "⚠️ Falta configurar la URL de Google Apps Script.";
+        return;
+    }
+
+    fetch(WEB_APP_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos)
+    })
+    .then(() => {
+        document.getElementById('status-envio').innerText = "✅ ¡Resultados enviados al docente con éxito!";
+    })
+    .catch((error) => {
+        console.error("Error al enviar:", error);
+        document.getElementById('status-envio').innerText = "❌ Hubo un error al enviar los resultados.";
+    });
 }
 </script>
 
