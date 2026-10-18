@@ -39,14 +39,11 @@
         
         .context-box { background: #f1f5f9; padding: 18px; border-left: 4px solid var(--primary); border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.6; color: #334155; }
         
-        /* Contenedores con colores diferenciados por nivel */
         .question-card { padding: 22px; border-radius: 12px; margin-bottom: 20px; border: 2px solid; }
-        
         .card-literal { background-color: var(--literal-bg); border-color: var(--literal-border); }
         .card-inferencial { background-color: var(--inferencial-bg); border-color: var(--inferencial-border); }
         .card-critico { background-color: var(--critico-bg); border-color: var(--critico-border); }
 
-        /* Etiquetas de nivel exclusivas */
         .badge-nivel { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; color: white; }
         .badge-literal { background-color: var(--literal-accent); }
         .badge-inferencial { background-color: var(--inferencial-accent); }
@@ -64,7 +61,6 @@
         button { background: var(--primary); color: white; border: none; padding: 14px 20px; font-size: 1rem; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 600; transition: background 0.2s; margin-top: 15px; }
         button:hover { background: var(--primary-dark); }
         
-        /* Animaciones grandes de feedback central */
         .feedback-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s ease; }
         .feedback-content { background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); max-width: 400px; width: 90%; }
         .feedback-emoji { font-size: 5rem; margin-bottom: 15px; }
@@ -304,7 +300,7 @@
 
 <script>
 let studentName = "";
-let respuestasEstudiante = {};
+let resultadosEstudiante = {};
 let puntajeTotal = 0;
 
 function iniciarEvaluacion() {
@@ -331,9 +327,11 @@ function procesarRespuesta(numQ) {
         return;
     }
 
-    respuestasEstudiante[`q${numQ}`] = seleccionada.value;
     const esCorrecta = seleccionada.getAttribute('data-correct') === 'true';
     
+    // Asigna ✔️ si es correcta o ❌ si es incorrecta para el reporte de Google Sheets
+    resultadosEstudiante[`q${numQ}`] = esCorrecta ? "✔️ Correcta" : "❌ Incorrecta";
+
     const overlay = document.getElementById('feedback-overlay');
     const emoji = document.getElementById('fb-emoji');
     const title = document.getElementById('fb-title');
@@ -388,16 +386,16 @@ function finalizarEvaluacion() {
         name: studentName,
         score: puntajeTotal,
         badges: badges.join(", "),
-        p1: respuestasEstudiante['q1'] || "Sin responder",
-        p2: respuestasEstudiante['q2'] || "Sin responder",
-        p3: respuestasEstudiante['q3'] || "Sin responder",
-        p4: respuestasEstudiante['q4'] || "Sin responder",
-        p5: respuestasEstudiante['q5'] || "Sin responder",
-        p6: respuestasEstudiante['q6'] || "Sin responder",
-        p7: respuestasEstudiante['q7'] || "Sin responder",
-        p8: respuestasEstudiante['q8'] || "Sin responder",
-        p9: respuestasEstudiante['q9'] || "Sin responder",
-        p10: respuestasEstudiante['q10'] || "Sin responder"
+        p1: resultadosEstudiante['q1'] || "Sin responder",
+        p2: resultadosEstudiante['q2'] || "Sin responder",
+        p3: resultadosEstudiante['q3'] || "Sin responder",
+        p4: resultadosEstudiante['q4'] || "Sin responder",
+        p5: resultadosEstudiante['q5'] || "Sin responder",
+        p6: resultadosEstudiante['q6'] || "Sin responder",
+        p7: resultadosEstudiante['q7'] || "Sin responder",
+        p8: resultadosEstudiante['q8'] || "Sin responder",
+        p9: resultadosEstudiante['q9'] || "Sin responder",
+        p10: resultadosEstudiante['q10'] || "Sin responder"
     };
 
     fetch(urlScript, {
@@ -406,7 +404,7 @@ function finalizarEvaluacion() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datosEnvio)
     }).then(() => {
-        document.getElementById('status-envio').innerText = "✅ Registro desglosado enviado y almacenado correctamente en el sistema.";
+        document.getElementById('status-envio').innerText = "✅ Registro con chulos y equis enviado y almacenado correctamente en el sistema.";
     }).catch(() => {
         document.getElementById('status-envio').innerText = "⚠️ Evaluación finalizada localmente. Error de enlace con el servidor de reportes.";
     });
