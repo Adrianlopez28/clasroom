@@ -10,7 +10,7 @@
             --bg-dark: #07132b;
             --blue-main: #0066ff;
             --blue-dark: #003399;
-            --blue-card-bg: rgba(7, 24, 56, 0.85);
+            --blue-card-bg: rgba(7, 24, 56, 0.90);
             --border-glow: #1a5fff;
             --text-white: #ffffff;
             --text-muted: #94a3b8;
@@ -121,18 +121,32 @@
             font-weight: 600;
         }
 
-        /* --- CONTENEDOR PRINCIPAL DEL JUEGO --- */
+        /* --- CONTENEDOR PRINCIPAL DEL JUEGO (LAYOUT DE DOS COLUMNAS) --- */
         .game-viewport {
             flex: 1;
             position: relative;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: flex-end;
-            padding: 30px 5%;
+            padding: 20px 4%;
+            background-image: url('image_cda8bc.png');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            min-height: 580px;
+            min-height: 600px;
+            gap: 30px;
+        }
+
+        /* Columna Izquierda: Escenario Gráfico con la Escalera y el Niño */
+        .scenery-container {
+            flex: 1;
+            height: 100%;
+            min-height: 520px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 20px;
         }
 
         /* Registro Modal / Contenedor */
@@ -168,15 +182,16 @@
         /* --- TARJETA DE PREGUNTA DERECHA --- */
         .question-container {
             width: 100%;
-            max-width: 620px;
+            max-width: 580px;
             background: var(--blue-card-bg);
             border: 2px solid rgba(0, 102, 255, 0.6);
             border-radius: 24px;
             backdrop-filter: blur(12px);
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 0 20px rgba(0, 102, 255, 0.2);
             overflow: hidden;
-            display: none; /* Se activa al iniciar */
+            display: none; 
             animation: slideIn 0.4s ease-out;
+            z-index: 5;
         }
 
         @keyframes slideIn {
@@ -229,11 +244,9 @@
         }
 
         .card-body {
-            padding: 25px;
+            padding: 22px 25px;
             background: #ffffff;
             color: #0f172a;
-            border-bottom-left-radius: 20px;
-            border-bottom-right-radius: 20px;
         }
 
         .topic-pill {
@@ -248,18 +261,18 @@
         }
 
         .question-title {
-            font-size: 1.15rem;
+            font-size: 1.1rem;
             font-weight: 800;
-            line-height: 1.5;
+            line-height: 1.4;
             color: #0f172a;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         /* OPCIONES DE RESPUESTA */
         .options-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .option-item {
@@ -286,8 +299,8 @@
         }
 
         .option-letter {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             background: #0066ff;
             color: white;
@@ -301,7 +314,7 @@
         }
 
         .option-text {
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             font-weight: 600;
             color: #1e293b;
             flex: 1;
@@ -325,7 +338,7 @@
         }
 
         .card-footer {
-            padding: 20px 25px;
+            padding: 18px 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -408,6 +421,7 @@
             width: 90%;
             margin: auto;
             box-shadow: 0 0 40px rgba(0, 102, 255, 0.6);
+            z-index: 50;
         }
 
         .badge-result {
@@ -467,8 +481,13 @@
         </div>
     </header>
 
-    <!-- ESCENARIO CON FONDO -->
-    <main class="game-viewport" id="viewport" style="background-image: url('image_cda8bc.png');">
+    <!-- ESCENARIO CON FONDO 3D E INTERFAZ INTEGRADA -->
+    <main class="game-viewport" id="viewport">
+
+        <!-- Columna Izquierda (Muestra visual de la escalera y el niño de fondo) -->
+        <div class="scenery-container">
+            <!-- El fondo 3D cubre perfectamente este espacio para que se vea el niño y la escalera de piedra -->
+        </div>
 
         <!-- REGISTRO DE ESTUDIANTE -->
         <div class="modal-register" id="modal-register">
@@ -478,7 +497,7 @@
             <button class="btn-next" style="width: 100%; justify-content: center;" onclick="iniciarEvaluacion()">Comenzar Aventura ➔</button>
         </div>
 
-        <!-- TARJETA DE PREGUNTA EN JUEGO -->
+        <!-- TARJETA DE PREGUNTA EN JUEGO (LADO DERECHO) -->
         <div class="question-container" id="question-card">
             <div class="card-header">
                 <div class="level-badge">
@@ -497,7 +516,7 @@
                 <div class="question-title" id="lbl-question-title">1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *</div>
 
                 <div class="options-list" id="options-container">
-                    <!-- Las opciones se generan dinámicamente -->
+                    <!-- Opciones generadas dinámicamente -->
                 </div>
             </div>
 
@@ -559,7 +578,6 @@
     </footer>
 
     <script>
-        // --- BASE DE DATOS DE PREGUNTAS ---
         const bancoPreguntas = [
             {
                 num: 1,
@@ -683,7 +701,6 @@
             }
         ];
 
-        // --- VARIABLES DE ESTADO ---
         let studentName = "";
         let indicePregunta = 0;
         let puntajeTotal = 0;
@@ -709,21 +726,17 @@
             opcionSeleccionada = null;
             const q = bancoPreguntas[indicePregunta];
 
-            // Actualizar HUD
             document.getElementById('hud-level').innerText = `${q.num}/10`;
             document.getElementById('lbl-level-title').innerText = q.nivel;
             document.getElementById('lbl-progress-text').innerText = `Pregunta ${q.num} de 10`;
             document.getElementById('progress-fill').style.width = `${(q.num / 10) * 100}%`;
 
-            // Cargar textos de pregunta
             document.getElementById('lbl-topic').innerText = q.tema;
             document.getElementById('lbl-question-title').innerText = q.pregunta;
 
-            // Aleatorizar opciones para este cliente/equipo
             let opcionesMezcladas = [...q.opciones];
             opcionesMezcladas.sort(() => Math.random() - 0.5);
 
-            // Generar HTML de opciones
             const container = document.getElementById('options-container');
             container.innerHTML = "";
 
@@ -794,7 +807,6 @@
             document.getElementById('final-score-text').innerText = `Puntaje Final: ${puntajeTotal} / 100 Puntos (${puntajeTotal}%)`;
             document.getElementById('final-badge').innerText = insigniaFinal;
 
-            // Datos limpios para Google Sheets
             const datos = {
                 fecha: new Date().toLocaleString(),
                 nombre: studentName,
