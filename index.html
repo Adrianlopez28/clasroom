@@ -500,7 +500,6 @@
 
     <main class="game-viewport" id="viewport">
 
-        <!-- Contenedor con la imagen JUEGO.png de fondo y el personaje escalando -->
         <div class="scenery-canvas-container" id="scenery-container">
             <canvas id="gameCanvas" width="520" height="520"></canvas>
         </div>
@@ -722,19 +721,19 @@
 
         let canvas, ctx;
 
-        // Coordenadas exactas sobre los escalones de la imagen JUEGO.png
+        // Coordenadas ajustadas para que el personaje suba por los escalones hacia la derecha y la cima
         const coordenadasEscalones = [
-            { x: 300, y: 440 }, // Nivel 0 (Inicio)
-            { x: 380, y: 395 }, // Nivel 1
-            { x: 440, y: 345 }, // Nivel 2
-            { x: 445, y: 295 }, // Nivel 3
-            { x: 405, y: 255 }, // Nivel 4
-            { x: 350, y: 220 }, // Nivel 5
-            { x: 295, y: 190 }, // Nivel 6
-            { x: 285, y: 155 }, // Nivel 7
-            { x: 325, y: 130 }, // Nivel 8
-            { x: 385, y: 110 }, // Nivel 9
-            { x: 435, y: 80 }   // Nivel 10 (Cima)
+            { x: 280, y: 460 }, // Nivel 0 (Inicio abajo)
+            { x: 370, y: 395 }, // Nivel 1
+            { x: 440, y: 335 }, // Nivel 2
+            { x: 435, y: 275 }, // Nivel 3
+            { x: 395, y: 235 }, // Nivel 4
+            { x: 345, y: 200 }, // Nivel 5
+            { x: 295, y: 170 }, // Nivel 6
+            { x: 295, y: 135 }, // Nivel 7
+            { x: 345, y: 110 }, // Nivel 8
+            { x: 405, y: 95 },  // Nivel 9
+            { x: 450, y: 70 }   // Nivel 10 (Cima del castillo)
         ];
 
         function initCanvas() {
@@ -749,7 +748,7 @@
 
             let pos = coordenadasEscalones[Math.min(escalonActual, 10)];
 
-            // Dibujar al personaje 🧍 en el escalón actual
+            // Dibujar al personaje 🧍 en el escalón correspondiente a la derecha
             ctx.font = "32px Segoe UI Symbol";
             ctx.textAlign = "center";
             ctx.fillText("🧍", pos.x, pos.y);
