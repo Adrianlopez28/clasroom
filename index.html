@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Escalera del Saber - Comprensión Lectora</title>
-    <!-- Librerías de Three.js y Confeti -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root {
@@ -123,7 +121,7 @@
             font-weight: 600;
         }
 
-        /* --- CONTENEDOR PRINCIPAL: ESCENARIO 3D IZQUIERDA + TARJETA DERECHA --- */
+        /* --- CONTENEDOR PRINCIPAL DEL JUEGO --- */
         .game-viewport {
             flex: 1;
             position: relative;
@@ -131,20 +129,30 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px 4%;
-            min-height: 620px;
+            min-height: 600px;
+            gap: 20px;
         }
 
-        /* Lienzo 3D de Three.js (Escenario interactivo izquierdo) */
-        #canvas3d-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 55%;
+        /* ESCENARIO 2D CON EL PERSONAJE 🧍 Y LAS ESTRELLAS ⭐ */
+        .scenery-canvas-container {
+            flex: 1;
+            max-width: 500px;
+            height: 480px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid rgba(56, 189, 248, 0.3);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+        }
+
+        canvas {
+            width: 100%;
             height: 100%;
-            z-index: 1;
+            display: block;
         }
 
-        /* Registro Modal */
+        /* REGISTRO DE ESTUDIANTE */
         .modal-register {
             position: absolute;
             top: 50%;
@@ -187,7 +195,6 @@
             display: none; 
             animation: slideIn 0.4s ease-out;
             z-index: 10;
-            margin-left: auto;
         }
 
         @keyframes slideIn {
@@ -478,7 +485,7 @@
             </div>
 
             <div class="user-avatar">
-                <div class="avatar-img">👦</div>
+                <div class="avatar-img">🧍</div>
                 <span class="avatar-speech">¡Tú puedes!</span>
             </div>
         </div>
@@ -487,8 +494,10 @@
     <!-- ESCENARIO PRINCIPAL -->
     <main class="game-viewport" id="viewport">
 
-        <!-- Contenedor del Escenario 3D Interactivo (Izquierda) -->
-        <div id="canvas3d-container"></div>
+        <!-- Contenedor del Escenario Gráfico con el Niños 🧍 y Estrellas ⭐ -->
+        <div class="scenery-canvas-container" id="scenery-container">
+            <canvas id="gameCanvas" width="500" height="480"></canvas>
+        </div>
 
         <!-- REGISTRO DE ESTUDIANTE -->
         <div class="modal-register" id="modal-register">
@@ -546,12 +555,12 @@
 
     </main>
 
-    <!-- VENTANA DE NOTIFICACIÓN DE RESPUESTA (ACIERTO / FALLO) -->
+    <!-- VENTANA DE NOTIFICACIÓN DE RESPUESTA -->
     <div class="feedback-overlay" id="feedback-overlay">
         <div class="feedback-box">
             <div class="feedback-icon" id="fb-icon">🎉</div>
             <div class="feedback-title" id="fb-title" style="color: #38bdf8;">¡Respuesta Correcta!</div>
-            <div class="feedback-sub" id="fb-sub">+10 Puntos | ¡Avanzas un escalón!</div>
+            <div class="feedback-sub" id="fb-sub">+10 Puntos | ¡Sumas una estrella y subes de escalón!</div>
         </div>
     </div>
 
@@ -696,105 +705,66 @@
         let studentName = "";
         let indicePregunta = 0;
         let puntajeTotal = 0;
+        let escalonActual = 0;
+        let estrellasGanadas = 0;
         let opcionSeleccionada = null;
         let resultadosEstudiante = { q1:"❌", q2:"❌", q3:"❌", q4:"❌", q5:"❌", q6:"❌", q7:"❌", q8:"❌", q9:"❌", q10:"❌" };
 
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwLnNXJmQDhg_nVjV7CGPzdAU5V2gfCpQXx_UqSDWHkXQgkrPLIYbp1wDMNwlg-EOVlZw/exec";
 
-        // --- MOTOR 3D CON THREE.JS (ESCALERAS E ISLAS FLOTANTES) ---
-        let scene, camera, renderer, playerGroup;
-        const escalonesMeshes = [];
+        // --- MOTOR GRÁFICO 2D (EL NIÑO 🧍 SUBE LAS ESCALERAS Y SUMA ESTRELLAS ⭐) ---
+        let canvas, ctx;
 
-        function init3D() {
-            const container = document.getElementById('canvas3d-container');
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x07132b);
-            scene.fog = new THREE.FogExp2(0x07132b, 0.025);
+        function initCanvas() {
+            canvas = document.getElementById('gameCanvas');
+            ctx = canvas.getContext('2d');
+            dibujarEscenario();
+        }
 
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(-8, 5, 12);
-            camera.lookAt(0, 2, 0);
+        function dibujarEscenario() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            container.appendChild(renderer.domElement);
+            // Fondo espacial/nocturno
+            ctx.fillStyle = "#020617";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Luces
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            scene.add(ambientLight);
-            const dirLight = new THREE.DirectionalLight(0x38bdf8, 1.2);
-            dirLight.position.set(10, 20, 10);
-            scene.add(dirLight);
-
-            // Construir Escalera de 10 peldaños
+            // Dibujar 10 Escalones con profundidad
             for (let i = 0; i < 10; i++) {
-                const stepGeo = new THREE.BoxGeometry(1.6, 0.4, 1.2);
-                const stepMat = new THREE.MeshStandardMaterial({ 
-                    color: i === 0 ? 0x10b981 : 0x334155, 
-                    roughness: 0.4 
-                });
-                const step = new THREE.Mesh(stepGeo, stepMat);
-                
-                // Posición escalonada en pendiente
-                step.position.set(i * 0.9 - 3.5, i * 0.5 - 1.5, 0);
-                scene.add(step);
-                escalonesMeshes.push(step);
+                let x = 30 + (i * 42);
+                let y = 410 - (i * 35);
 
-                // Estrella flotante decorativa en cada escalón
-                const starGeo = new THREE.OctahedronGeometry(0.2);
-                const starMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, emissive: 0xf59e0b });
-                const star = new THREE.Mesh(starGeo, starMat);
-                star.position.set(i * 0.9 - 3.5, i * 0.5 - 0.8, 0);
-                scene.add(star);
+                // Sombra
+                ctx.fillStyle = "#0f172a";
+                ctx.fillRect(x + 3, y + 4, 60, 16);
+
+                // Plataforma
+                ctx.fillStyle = (i < escalonActual) ? "#0066ff" : "#334155";
+                ctx.fillRect(x, y, 60, 12);
+
+                // Borde superior
+                ctx.fillStyle = (i < escalonActual) ? "#38bdf8" : "#64748b";
+                ctx.fillRect(x, y, 60, 3);
             }
 
-            // Crear Avatar del Estudiante (Cubo con mochila y cabeza estilizada)
-            playerGroup = new THREE.Group();
-            
-            // Cuerpo
-            const bodyGeo = new THREE.BoxGeometry(0.5, 0.7, 0.3);
-            const bodyMat = new THREE.MeshStandardMaterial({ color: 0x0066ff });
-            const body = new THREE.Mesh(bodyGeo, bodyMat);
-            body.position.y = 0.35;
-            playerGroup.add(body);
+            // Templo / Libro en la cima
+            let cimaX = 30 + (10 * 42) - 15;
+            let cimaY = 410 - (10 * 35) - 10;
+            ctx.font = "32px Segoe UI Symbol";
+            ctx.fillText("🏆", cimaX, cimaY);
 
-            // Mochila
-            const bagGeo = new THREE.BoxGeometry(0.3, 0.4, 0.2);
-            const bagMat = new THREE.MeshStandardMaterial({ color: 0xf97316 });
-            const bag = new THREE.Mesh(bagGeo, bagMat);
-            bag.position.set(0, 0.35, -0.25);
-            playerGroup.add(bag);
+            // Dibujar al niño 🧍 en el escalón actual
+            let px = 30 + (escalonActual * 42) + 12;
+            let py = 410 - (escalonActual * 35) - 8;
 
-            // Cabeza
-            const headGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4);
-            const headMat = new THREE.MeshStandardMaterial({ color: 0xfbcfe8 });
-            const head = new THREE.Mesh(headGeo, headMat);
-            head.position.y = 0.85;
-            playerGroup.add(head);
+            ctx.font = "36px Segoe UI Symbol";
+            ctx.fillText("🧍", px, py);
 
-            // Posición inicial en el escalón 0
-            playerGroup.position.set(-3.5, -1.1, 0);
-            scene.add(playerGroup);
-
-            animate3D();
-        }
-
-        function animate3D() {
-            requestAnimationFrame(animate3D);
-            renderer.render(scene, camera);
-        }
-
-        function actualizarAvatar3D(nivelActual) {
-            if (nivelActual < 10) {
-                const targetX = (nivelActual * 0.9) - 3.5;
-                const targetY = (nivelActual * 0.5) - 1.1;
-                playerGroup.position.set(targetX, targetY, 0);
-
-                // Colorear escalones completados
-                for(let i=0; i<=nivelActual; i++) {
-                    if(escalonesMeshes[i]) escalonesMeshes[i].material.color.setHex(0x10b981);
-                }
+            // Dibujar las estrellas ⭐ ganadas que flotan sobre la cabeza del niño 🧍
+            if (estrellasGanadas > 0) {
+                ctx.font = "16px Segoe UI Symbol";
+                let estrellasTexto = "⭐".repeat(Math.min(estrellasGanadas, 5));
+                ctx.fillText(estrellasTexto, px - 10, py - 38);
             }
         }
 
@@ -809,7 +779,7 @@
             document.getElementById('modal-register').style.display = 'none';
             document.getElementById('question-card').style.display = 'block';
             
-            init3D();
+            initCanvas();
             cargarPregunta();
         }
 
@@ -867,18 +837,21 @@
 
             if(opcionSeleccionada.correcta) {
                 puntajeTotal += 10;
+                escalonActual++;
+                estrellasGanadas++;
                 resultadosEstudiante[`q${qActual.num}`] = "✅";
+                
                 document.getElementById('hud-score').innerText = puntajeTotal;
                 
                 // Notificación visual de Acierto
-                icon.innerText = "🎉";
+                icon.innerText = "⭐";
                 title.innerText = "¡Respuesta Correcta!";
                 title.style.color = "#34d399";
-                sub.innerText = "+10 Puntos | ¡Subes un escalón en la montaña!";
+                sub.innerText = "+10 Puntos | ¡Sumas una estrella y el niño 🧍 sube de escalón!";
                 overlay.style.display = "flex";
 
                 confetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } });
-                actualizarAvatar3D(indicePregunta + 1);
+                dibujarEscenario();
             } else {
                 resultadosEstudiante[`q${qActual.num}`] = "❌";
                 
@@ -886,8 +859,9 @@
                 icon.innerText = "❌";
                 title.innerText = "Respuesta Incorrecta";
                 title.style.color = "#f87171";
-                sub.innerText = "No sumas puntos en este escalón.";
+                sub.innerText = "No sumas puntos ni estrella en este escalón.";
                 overlay.style.display = "flex";
+                dibujarEscenario();
             }
 
             setTimeout(() => {
@@ -917,10 +891,10 @@
             }
 
             document.getElementById('final-student-name').innerText = `Estudiante: ${studentName}`;
-            document.getElementById('final-score-text').innerText = `Puntaje Final: ${puntajeTotal} / 100 Puntos (${puntajeTotal}%)`;
+            document.getElementById('final-score-text').innerText = `Puntaje Final: ${puntajeTotal} / 100 Puntos (${puntajeTotal}%) - Estrellas: ${estrellasGanadas} ⭐`;
             document.getElementById('final-badge').innerText = insigniaFinal;
 
-            // Envío automático al Web App de Google Sheets
+            // Envío automático a Google Sheets
             const datos = {
                 fecha: new Date().toLocaleString(),
                 nombre: studentName,
