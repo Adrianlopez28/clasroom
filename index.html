@@ -15,18 +15,18 @@
             --text: #1e293b; 
             --border: #e2e8f0;
             
-            /* Colores de contenedores por Nivel Cognitivo */
-            --literal-bg: #f0fdf4;
-            --literal-border: #bbf7d0;
-            --literal-color: #166534;
+            /* Fondos y bordes distintivos por cada nivel */
+            --literal-bg: #e8f5e9;
+            --literal-border: #a5d6a7;
+            --literal-accent: #2e7d32;
 
-            --inferencial-bg: #eff6ff;
-            --inferencial-border: #bfdbfe;
-            --inferencial-color: #1e40af;
+            --inferencial-bg: #e3f2fd;
+            --inferencial-border: #90caf9;
+            --inferencial-accent: #1565c0;
 
-            --critico-bg: #fdf4ff;
-            --critico-border: #f5d0fe;
-            --critico-color: #86198f;
+            --critico-bg: #f3e5f5;
+            --critico-border: #ce93d8;
+            --critico-accent: #6a1b9a;
         }
         body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
         .container { width: 100%; max-width: 750px; background: var(--card-bg); padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); box-sizing: border-box; }
@@ -39,18 +39,20 @@
         
         .context-box { background: #f1f5f9; padding: 18px; border-left: 4px solid var(--primary); border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.6; color: #334155; }
         
-        /* Contenedores con color de fondo y bordes según nivel */
-        .question-card { padding: 20px; border-radius: 12px; margin-bottom: 20px; border: 2px solid var(--border); }
-        .card-literal { background: var(--literal-bg); border-color: var(--literal-border); }
-        .card-literal .question-title { color: var(--literal-color); }
+        /* Contenedores con colores diferenciados por nivel */
+        .question-card { padding: 22px; border-radius: 12px; margin-bottom: 20px; border: 2px solid; }
+        
+        .card-literal { background-color: var(--literal-bg); border-color: var(--literal-border); }
+        .card-inferencial { background-color: var(--inferencial-bg); border-color: var(--inferencial-border); }
+        .card-critico { background-color: var(--critico-bg); border-color: var(--critico-border); }
 
-        .card-inferencial { background: var(--inferencial-bg); border-color: var(--inferencial-border); }
-        .card-inferencial .question-title { color: var(--inferencial-color); }
+        /* Etiquetas de nivel exclusivas */
+        .badge-nivel { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; color: white; }
+        .badge-literal { background-color: var(--literal-accent); }
+        .badge-inferencial { background-color: var(--inferencial-accent); }
+        .badge-critico { background-color: var(--critico-accent); }
 
-        .card-critico { background: var(--critico-bg); border-color: var(--critico-border); }
-        .card-critico .question-title { color: var(--critico-color); }
-
-        .question-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 15px; }
+        .question-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 15px; color: #1e293b; }
 
         .options label { display: block; margin: 10px 0; padding: 14px 16px; background: white; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95rem; }
         .options label:hover { border-color: var(--primary); background: #f8fafc; }
@@ -80,7 +82,7 @@
 
 <div class="container">
     <h1>Evaluación de Comprensión Lectora</h1>
-    <p class="subtitle">Niveles: Literal, Inferencial y Crítico[cite: 1]</p>
+    <p class="subtitle">Niveles: Literal, Inferencial y Crítico</p>
     
     <div class="progress-container">
         <div class="progress-bar" id="progress"></div>
@@ -100,15 +102,16 @@
     <div id="step-1" class="step-box">
         <div class="context-box">
             <b>Texto 1: El ciclo de la vida (Biología)</b><br>
-            Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente y comienzan a desarrollar pulmones. Finalmente, emergen a la tierra como ranas adultas, listas para explorar un mundo nuevo fuera del agua.[cite: 1]
+            Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente y comienzan a desarrollar pulmones. Finalmente, emergen a la tierra como ranas adultas, listas para explorar un mundo nuevo fuera del agua.
         </div>
         <div class="question-card card-literal">
-            <div class="question-title">1. (Nivel Literal - Básico) ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *[cite: 1]</div>
+            <span class="badge-nivel badge-literal">Nivel Literal</span>
+            <div class="question-title">1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *</div>
             <div class="options">
-                <label><input type="radio" name="q1" value="Comienzan a caminar sobre el agua"> Comienzan a caminar sobre el agua.[cite: 1]</label>
-                <label><input type="radio" name="q1" value="Sus pulmones desaparecen"> Sus pulmones desaparecen.[cite: 1]</label>
-                <label><input type="radio" name="q1" value="El método de respiración y su anatomía física" data-correct="true"> El método de respiración y su anatomía física.[cite: 1]</label>
-                <label><input type="radio" name="q1" value="Su dieta se vuelve exclusivamente acuática"> Su dieta se vuelve exclusivamente acuática.[cite: 1]</label>
+                <label><input type="radio" name="q1" value="Comienzan a caminar sobre el agua"> Comienzan a caminar sobre el agua.</label>
+                <label><input type="radio" name="q1" value="Sus pulmones desaparecen"> Sus pulmones desaparecen.</label>
+                <label><input type="radio" name="q1" value="El método de respiración y su anatomía física" data-correct="true"> El método de respiración y su anatomía física.</label>
+                <label><input type="radio" name="q1" value="Su dieta se vuelve exclusivamente acuática"> Su dieta se vuelve exclusivamente acuática.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(1)">Siguiente Pregunta ➔</button>
@@ -120,12 +123,13 @@
             <b>Texto 1: El ciclo de la vida (Biología)</b> (Continuación)
         </div>
         <div class="question-card card-inferencial">
-            <div class="question-title">2. (Nivel Inferencial - Intermedio) ¿Qué se puede deducir sobre el entorno de vida de las ranas? *[cite: 2]</div>
+            <span class="badge-nivel badge-inferencial">Nivel Inferencial</span>
+            <div class="question-title">2. ¿Qué se puede deducir sobre el entorno de vida de las ranas? *</div>
             <div class="options">
-                <label><input type="radio" name="q2" value="Solo pueden vivir en entornos húmedos debido a su piel"> Solo pueden vivir en entornos húmedos debido a su piel.[cite: 2]</label>
-                <label><input type="radio" name="q2" value="Son animales que necesitan adaptarse a dos medios distintos durante su vida" data-correct="true"> Son animales que necesitan adaptarse a dos medios distintos durante su vida.[cite: 2]</label>
-                <label><input type="radio" name="q2" value="Los renacuajos son más rápidos que las ranas adultas"> Los renacuajos son más rápidos que las ranas adultas.[cite: 2]</label>
-                <label><input type="radio" name="q2" value="La metamorfosis ocurre solo en climas fríos"> La metamorfosis ocurre solo en climas fríos.[cite: 2]</label>
+                <label><input type="radio" name="q2" value="Solo pueden vivir en entornos húmedos debido a su piel"> Solo pueden vivir en entornos húmedos debido a su piel.</label>
+                <label><input type="radio" name="q2" value="Son animales que necesitan adaptarse a dos medios distintos durante su vida" data-correct="true"> Son animales que necesitan adaptarse a dos medios distintos durante su vida.</label>
+                <label><input type="radio" name="q2" value="Los renacuajos son más rápidos que las ranas adultas"> Los renacuajos son más rápidos que las ranas adultas.</label>
+                <label><input type="radio" name="q2" value="La metamorfosis ocurre solo en climas fríos"> La metamorfosis ocurre solo en climas fríos.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(2)">Siguiente Pregunta ➔</button>
@@ -135,15 +139,16 @@
     <div id="step-3" class="step-box">
         <div class="context-box">
             <b>Texto 2: El Nilo y Egipto (Historia)</b><br>
-            El Antiguo Egipto no habría sido la civilización esplendorosa que conocemos sin el río Nilo. Cada año, el río se desbordaba, cubriendo las tierras circundantes con un lodo fértil que permitía el cultivo de trigo y cebada. Los egipcios aprendieron a controlar estas crecidas mediante canales de riego, lo que les permitió tener excedentes de comida, tiempo para construir pirámides y desarrollar una sociedad compleja.[cite: 2]
+            El Antiguo Egipto no habría sido la civilización esplendorosa que conocemos sin el río Nilo. Cada año, el río se desbordaba, cubriendo las tierras circundantes con un lodo fértil que permitía el cultivo de trigo y cebada. Los egipcios aprendieron a controlar estas crecidas mediante canales de riego, lo que les permitió tener excedentes de comida, tiempo para construir pirámides y desarrollar una sociedad compleja.
         </div>
         <div class="question-card card-literal">
-            <div class="question-title">3. (Nivel Literal - Básico) ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos? *[cite: 2]</div>
+            <span class="badge-nivel badge-literal">Nivel Literal</span>
+            <div class="question-title">3. ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos? *</div>
             <div class="options">
-                <label><input type="radio" name="q3" value="La construcción de las grandes pirámides de piedra"> La construcción de las grandes pirámides de piedra.[cite: 2]</label>
-                <label><input type="radio" name="q3" value="La creación de canales de navegación rápidos"> La creación de canales de navegación rápidos.[cite: 2]</label>
-                <label><input type="radio" name="q3" value="El cultivo abundante de cereales como el trigo y la cebada" data-correct="true"> El cultivo abundante de cereales como el trigo y la cebada.[cite: 2]</label>
-                <label><input type="radio" name="q3" value="La limpieza del agua para el consumo humano"> La limpieza del agua para el consumo humano.[cite: 2]</label>
+                <label><input type="radio" name="q3" value="La construcción de las grandes pirámides de piedra"> La construcción de las grandes pirámides de piedra.</label>
+                <label><input type="radio" name="q3" value="La creación de canales de navegación rápidos"> La creación de canales de navegación rápidos.</label>
+                <label><input type="radio" name="q3" value="El cultivo abundante de cereales como el trigo y la cebada" data-correct="true"> El cultivo abundante de cereales como el trigo y la cebada.</label>
+                <label><input type="radio" name="q3" value="La limpieza del agua para el consumo humano"> La limpieza del agua para el consumo humano.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(3)">Siguiente Pregunta ➔</button>
@@ -155,12 +160,13 @@
             <b>Texto 2: El Nilo y Egipto (Historia)</b> (Continuación)
         </div>
         <div class="question-card card-critico">
-            <div class="question-title">4. (Nivel Crítico - Avanzado) ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia? *[cite: 3]</div>
+            <span class="badge-nivel badge-critico">Nivel Crítico</span>
+            <div class="question-title">4. ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia? *</div>
             <div class="options">
-                <label><input type="radio" name="q4" value="Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar"> Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.[cite: 3]</label>
-                <label><input type="radio" name="q4" value="Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social" data-correct="true"> Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.[cite: 3]</label>
-                <label><input type="radio" name="q4" value="Dificultó el progreso porque las inundaciones destruían constantemente las casas"> Dificultó el progreso porque las inundaciones destruían constantemente las casas.[cite: 3]</label>
-                <label><input type="radio" name="q4" value="Solo sirvió como defensa natural contra los enemigos extranjeros"> Solo sirvió como defensa natural contra los enemigos extranjeros.[cite: 3]</label>
+                <label><input type="radio" name="q4" value="Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar"> Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.</label>
+                <label><input type="radio" name="q4" value="Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social" data-correct="true"> Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.</label>
+                <label><input type="radio" name="q4" value="Dificultó el progreso porque las inundaciones destruían constantemente las casas"> Dificultó el progreso porque las inundaciones destruían constantemente las casas.</label>
+                <label><input type="radio" name="q4" value="Solo sirvió como defensa natural contra los enemigos extranjeros"> Solo sirvió como defensa natural contra los enemigos extranjeros.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(4)">Siguiente Pregunta ➔</button>
@@ -170,15 +176,16 @@
     <div id="step-5" class="step-box">
         <div class="context-box">
             <b>Texto 3: El uso de la tecnología (Sociedad)</b><br>
-            El uso excesivo de dispositivos electrónicos antes de dormir se ha convertido en una preocupación de salud pública. La luz azul emitida por las pantallas engaña a nuestro cerebro haciéndole creer que aún es de día, lo que inhibe la producción de melatonina, la hormona encargada de inducir el sueño. Como resultado, muchos jóvenes reportan fatiga, falta de concentración en clases y mal humor durante el día.[cite: 3]
+            El uso excesivo de dispositivos electrónicos antes de dormir se ha convertido en una preocupación de salud pública. La luz azul emitida por las pantallas engaña a nuestro cerebro haciéndole creer que aún es de día, lo que inhibe la producción de melatonina, la hormona encargada de inducir el sueño. Como resultado, muchos jóvenes reportan fatiga, falta de concentración en clases y mal humor durante el día.
         </div>
         <div class="question-card card-inferencial">
-            <div class="question-title">5. (Nivel Inferencial - Intermedio) ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar? *[cite: 3]</div>
+            <span class="badge-nivel badge-inferencial">Nivel Inferencial</span>
+            <div class="question-title">5. ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar? *</div>
             <div class="options">
-                <label><input type="radio" name="q5" value="La luz azul mejora la memoria a largo plazo"> La luz azul mejora la memoria a largo plazo.[cite: 3]</label>
-                <label><input type="radio" name="q5" value="No existe ninguna relación; el cansancio es solo una excusa"> No existe ninguna relación; el cansancio es solo una excusa.[cite: 3]</label>
-                <label><input type="radio" name="q5" value="La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo" data-correct="true"> La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo.[cite: 3]</label>
-                <label><input type="radio" name="q5" value="El uso de dispositivos es necesario para estudiar mejor"> El uso de dispositivos es necesario para estudiar mejor.[cite: 3]</label>
+                <label><input type="radio" name="q5" value="La luz azul mejora la memoria a largo plazo"> La luz azul mejora la memoria a largo plazo.</label>
+                <label><input type="radio" name="q5" value="No existe ninguna relación; el cansancio es solo una excusa"> No existe ninguna relación; el cansancio es solo una excusa.</label>
+                <label><input type="radio" name="q5" value="La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo" data-correct="true"> La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo.</label>
+                <label><input type="radio" name="q5" value="El uso de dispositivos es necesario para estudiar mejor"> El uso de dispositivos es necesario para estudiar mejor.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(5)">Siguiente Pregunta ➔</button>
@@ -190,12 +197,13 @@
             <b>Texto 3: El uso de la tecnología (Sociedad)</b> (Continuación)
         </div>
         <div class="question-card card-critico">
-            <div class="question-title">6. (Nivel Crítico - Avanzado) ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir? *[cite: 4]</div>
+            <span class="badge-nivel badge-critico">Nivel Crítico</span>
+            <div class="question-title">6. ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir? *</div>
             <div class="options">
-                <label><input type="radio" name="q6" value="Promueve el uso de dispositivos como una forma de relajación"> Promueve el uso de dispositivos como una forma de relajación.[cite: 4]</label>
-                <label><input type="radio" name="q6" value="Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo" data-correct="true"> Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.[cite: 4]</label>
-                <label><input type="radio" name="q6" value="Considera que la tecnología es la causa de todas las enfermedades modernas"> Considera que la tecnología es la causa de todas las enfermedades modernas.[cite: 4]</label>
-                <label><input type="radio" name="q6" value="Sugiere que la melatonina no es importante para los jóvenes"> Sugiere que la melatonina no es importante para los jóvenes.[cite: 4]</label>
+                <label><input type="radio" name="q6" value="Promueve el uso de dispositivos como una forma de relajación"> Promueve el uso de dispositivos como una forma de relajación.</label>
+                <label><input type="radio" name="q6" value="Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo" data-correct="true"> Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.</label>
+                <label><input type="radio" name="q6" value="Considera que la tecnología es la causa de todas las enfermedades modernas"> Considera que la tecnología es la causa de todas las enfermedades modernas.</label>
+                <label><input type="radio" name="q6" value="Sugiere que la melatonina no es importante para los jóvenes"> Sugiere que la melatonina no es importante para los jóvenes.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(6)">Siguiente Pregunta ➔</button>
@@ -205,15 +213,16 @@
     <div id="step-7" class="step-box">
         <div class="context-box">
             <b>Texto 4: La semilla ambiciosa (Fábula)</b><br>
-            Una pequeña semilla cayó en tierra seca y dura. A su alrededor, las otras semillas se quejaban de la falta de agua, pero esta semilla decidió abrirse camino buscando las profundidades de la tierra, donde sabía que encontraría humedad. Años después, mientras las otras semillas habían desaparecido, aquella pequeña semilla se había convertido en un robusto árbol cuyas raíces profundas sostenían todo el jardín.[cite: 4]
+            Una pequeña semilla cayó en tierra seca y dura. A su alrededor, las otras semillas se quejaban de la falta de agua, pero esta semilla decidió abrirse camino buscando las profundidades de la tierra, donde sabía que encontraría humedad. Años después, mientras las otras semillas habían desaparecido, aquella pequeña semilla se había convertido en un robusto árbol cuyas raíces profundas sostenían todo el jardín.
         </div>
         <div class="question-card card-literal">
-            <div class="question-title">7. (Nivel Literal - Básico) ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca? *[cite: 4]</div>
+            <span class="badge-nivel badge-literal">Nivel Literal</span>
+            <div class="question-title">7. ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca? *</div>
             <div class="options">
-                <label><input type="radio" name="q7" value="Se quedó quieta esperando que lloviera"> Se quedó quieta esperando que lloviera.[cite: 4]</label>
-                <label><input type="radio" name="q7" value="Intentó buscar agua en las profundidades de la tierra" data-correct="true"> Intentó buscar agua en las profundidades de la tierra.[cite: 4]</label>
-                <label><input type="radio" name="q7" value="Se quejó junto con las otras semillas"> Se quejó junto con las otras semillas.[cite: 4]</label>
-                <label><input type="radio" name="q7" value="Se dejó llevar por el viento hacia otro lugar"> Se dejó llevar por el viento hacia otro lugar.[cite: 4]</label>
+                <label><input type="radio" name="q7" value="Se quedó quieta esperando que lloviera"> Se quedó quieta esperando que lloviera.</label>
+                <label><input type="radio" name="q7" value="Intentó buscar agua en las profundidades de la tierra" data-correct="true"> Intentó buscar agua en las profundidades de la tierra.</label>
+                <label><input type="radio" name="q7" value="Se quejó junto con las otras semillas"> Se quejó junto con las otras semillas.</label>
+                <label><input type="radio" name="q7" value="Se dejó llevar por el viento hacia otro lugar"> Se dejó llevar por el viento hacia otro lugar.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(7)">Siguiente Pregunta ➔</button>
@@ -225,12 +234,13 @@
             <b>Texto 4: La semilla ambiciosa (Fábula)</b> (Continuación)
         </div>
         <div class="question-card card-inferencial">
-            <div class="question-title">8. (Nivel Inferencial - Intermedio) ¿Qué representa la acción de la semilla en esta historia? *[cite: 5]</div>
+            <span class="badge-nivel badge-inferencial">Nivel Inferencial</span>
+            <div class="question-title">8. ¿Qué representa la acción de la semilla en esta historia? *</div>
             <div class="options">
-                <label><input type="radio" name="q8" value="La importancia de la suerte en la vida"> La importancia de la suerte en la vida.[cite: 5]</label>
-                <label><input type="radio" name="q8" value="La necesidad de adaptarse y esforzarse para superar las dificultades" data-correct="true"> La necesidad de adaptarse y esforzarse para superar las dificultades.[cite: 5]</label>
-                <label><input type="radio" name="q8" value="Que las plantas son seres inteligentes que planean el futuro"> Que las plantas son seres inteligentes que planean el futuro.[cite: 5]</label>
-                <label><input type="radio" name="q8" value="Que es mejor vivir en lugares cómodos que en lugares difíciles"> Que es mejor vivir en lugares cómodos que en lugares difíciles.[cite: 5]</label>
+                <label><input type="radio" name="q8" value="La importancia de la suerte en la vida"> La importancia de la suerte en la vida.</label>
+                <label><input type="radio" name="q8" value="La necesidad de adaptarse y esforzarse para superar las dificultades" data-correct="true"> La necesidad de adaptarse y esforzarse para superar las dificultades.</label>
+                <label><input type="radio" name="q8" value="Que las plantas son seres inteligentes que planean el futuro"> Que las plantas son seres inteligentes que planean el futuro.</label>
+                <label><input type="radio" name="q8" value="Que es mejor vivir en lugares cómodos que en lugares difíciles"> Que es mejor vivir en lugares cómodos que en lugares difíciles.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(8)">Siguiente Pregunta ➔</button>
@@ -240,15 +250,16 @@
     <div id="step-9" class="step-box">
         <div class="context-box">
             <b>Exploración espacial (Ciencia)</b><br>
-            La exploración de Marte ha sido un sueño de la humanidad durante décadas. Los científicos argumentan que estudiar el planeta rojo podría revelar si alguna vez hubo vida allí o si, en el futuro, los humanos podrían habitarlo. Sin embargo, este proceso es extremadamente costoso y requiere una cooperación internacional sin precedentes, lo que genera debates sobre si ese dinero debería invertirse primero en solucionar problemas de la Tierra.[cite: 5]
+            La exploración de Marte ha sido un sueño de la humanidad durante décadas. Los científicos argumentan que estudiar el planeta rojo podría revelar si alguna vez hubo vida allí o si, en el futuro, los humanos podrían habitarlo. Sin embargo, este proceso es extremadamente costoso y requiere una cooperación internacional sin precedentes, lo que genera debates sobre si ese dinero debería invertirse primero en solucionar problemas de la Tierra.
         </div>
         <div class="question-card card-inferencial">
-            <div class="question-title">9. (Nivel Inferencial - Intermedio) ¿Por qué la exploración de Marte es un tema de debate? *[cite: 5]</div>
+            <span class="badge-nivel badge-inferencial">Nivel Inferencial</span>
+            <div class="question-title">9. ¿Por qué la exploración de Marte es un tema de debate? *</div>
             <div class="options">
-                <label><input type="radio" name="q9" value="Porque no hay evidencia de que Marte sea un planeta interesante"> Porque no hay evidencia de que Marte sea un planeta interesante.[cite: 5]</label>
-                <label><input type="radio" name="q9" value="Porque los científicos no quieren cooperar entre sí"> Porque los científicos no quieren cooperar entre sí.[cite: 5]</label>
-                <label><input type="radio" name="q9" value="Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes" data-correct="true"> Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes.[cite: 5]</label>
-                <label><input type="radio" name="q9" value="Porque el costo es bajo pero los riesgos son muy altos"> Porque el costo es bajo pero los riesgos son muy altos.[cite: 5]</label>
+                <label><input type="radio" name="q9" value="Porque no hay evidencia de que Marte sea un planeta interesante"> Porque no hay evidencia de que Marte sea un planeta interesante.</label>
+                <label><input type="radio" name="q9" value="Porque los científicos no quieren cooperar entre sí"> Porque los científicos no quieren cooperar entre sí.</label>
+                <label><input type="radio" name="q9" value="Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes" data-correct="true"> Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes.</label>
+                <label><input type="radio" name="q9" value="Porque el costo es bajo pero los riesgos son muy altos"> Porque el costo es bajo pero los riesgos son muy altos.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(9)">Siguiente Pregunta ➔</button>
@@ -260,12 +271,13 @@
             <b>Exploración espacial (Ciencia)</b> (Continuación)
         </div>
         <div class="question-card card-critico">
-            <div class="question-title">10. (Nivel Crítico - Avanzado) ¿Cuál es el dilema principal que plantea el texto? *[cite: 6]</div>
+            <span class="badge-nivel badge-critico">Nivel Crítico</span>
+            <div class="question-title">10. ¿Cuál es el dilema principal que plantea el texto? *</div>
             <div class="options">
-                <label><input type="radio" name="q10" value="La tecnología actual es incapaz de llegar a Marte"> La tecnología actual es incapaz de llegar a Marte.[cite: 6]</label>
-                <label><input type="radio" name="q10" value="La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales" data-correct="true"> La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.[cite: 6]</label>
-                <label><input type="radio" name="q10" value="Marte es un planeta demasiado peligroso para los seres humanos"> Marte es un planeta demasiado peligroso para los seres humanos.[cite: 6]</label>
-                <label><input type="radio" name="q10" value="La falta de interés de la población en la exploración espacial"> La falta de interés de la población en la exploración espacial.[cite: 6]</label>
+                <label><input type="radio" name="q10" value="La tecnología actual es incapaz de llegar a Marte"> La tecnología actual es incapaz de llegar a Marte.</label>
+                <label><input type="radio" name="q10" value="La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales" data-correct="true"> La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.</label>
+                <label><input type="radio" name="q10" value="Marte es un planeta demasiado peligroso para los seres humanos"> Marte es un planeta demasiado peligroso para los seres humanos.</label>
+                <label><input type="radio" name="q10" value="La falta de interés de la población en la exploración espacial"> La falta de interés de la población en la exploración espacial.</label>
             </div>
         </div>
         <button onclick="procesarRespuesta(10)">Finalizar y Enviar Reporte 🏆</button>
@@ -319,7 +331,6 @@ function procesarRespuesta(numQ) {
         return;
     }
 
-    // Guardar respuesta exacta elegida por el estudiante
     respuestasEstudiante[`q${numQ}`] = seleccionada.value;
     const esCorrecta = seleccionada.getAttribute('data-correct') === 'true';
     
@@ -335,7 +346,6 @@ function procesarRespuesta(numQ) {
         sub.innerText = "Respuesta Correcta (+10 Puntos)";
         overlay.style.display = "flex";
         
-        // Lluvia de confeti grande
         confetti({
             particleCount: 120,
             spread: 80,
@@ -348,7 +358,6 @@ function procesarRespuesta(numQ) {
         overlay.style.display = "flex";
     }
 
-    // Ocultar modal y avanzar después de 1.8 segundos
     setTimeout(() => {
         overlay.style.display = "none";
         if(numQ === 10) {
@@ -360,7 +369,6 @@ function procesarRespuesta(numQ) {
 }
 
 function finalizarEvaluacion() {
-    // Cálculo de Insignias
     let badges = [];
     if(puntajeTotal >= 30) badges.push("Explorador Literal");
     if(puntajeTotal >= 40) badges.push("Pensador Inferencial");
@@ -374,7 +382,6 @@ function finalizarEvaluacion() {
     badges.forEach(b => { badgeHtml += `<div class="badge">🏆 ${b}</div>`; });
     document.getElementById('badges-list').innerHTML = badgeHtml;
 
-    // Reporte detallado hacia Google Apps Script con claves correctas p1 a p10
     const urlScript = "https://script.google.com/macros/s/AKfycby8c2lm6fFQx9tGEENB_LHzbvxqTAEJgwvnRTxUmuycSdvrURN6qPkfKiJUWeEBKqTOfw/exec"; 
     
     const datosEnvio = {
