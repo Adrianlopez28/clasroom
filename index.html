@@ -3,285 +3,367 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escape Room: Comprensión de lectura</title>
+    <title>Evaluación de Comprensión Lectora</title>
     <style>
-        :root { --primary: #7c3aed; --secondary: #06b6d4; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 750px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
-        h1 { color: var(--secondary); text-align: center; font-size: 2rem; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 25px; }
-        .room-box { display: none; }
-        .room-box.active { display: block; animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .story-box { background: #0f172a; padding: 15px; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 20px; font-style: italic; color: #cbd5e1; }
-        .question-card { background: #334155; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .options label { display: block; margin: 8px 0; padding: 12px; background: #1e293b; border: 1px solid #475569; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
-        .options label:hover { background: #475569; border-color: var(--secondary); }
-        input[type="text"] { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
-        button { background: var(--secondary); color: #0f172a; border: none; padding: 14px 20px; font-size: 1rem; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.2s; }
-        button:hover { background: #22d3ee; }
+        :root { 
+            --primary: #2563eb; 
+            --primary-dark: #1d4ed8; 
+            --success: #10b981; 
+            --warning: #f59e0b; 
+            --danger: #ef4444; 
+            --bg: #f8fafc; 
+            --card-bg: #ffffff; 
+            --text: #1e293b; 
+            --border: #e2e8f0;
+            
+            /* Colores por Nivel Cognitivo */
+            --literal: #0d9488;  /* Verde Turquesa */
+            --inferencial: #2563eb; /* Azul */
+            --critico: #7c3aed;  /* Violeta */
+        }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 750px; background: var(--card-bg); padding: 40px; border-radius: 16px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); border: 1px solid var(--border); box-sizing: border-box; }
+        h1 { color: var(--primary); text-align: center; font-size: 1.75rem; margin-top: 0; margin-bottom: 8px; font-weight: 700; }
+        .subtitle { text-align: center; color: #64748b; margin-bottom: 25px; font-size: 0.95rem; }
+        
+        .step-box { display: none; }
+        .step-box.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .context-box { background: #f1f5f9; padding: 18px; border-left: 4px solid var(--primary); border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.6; color: #334155; }
+        
+        /* Clases de colores según el nivel cognitivo */
+        .question-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--primary); }
+        .question-literal { border-left-color: var(--literal); }
+        .question-literal .tag-nivel { color: var(--literal); font-weight: 700; }
+
+        .question-inferencial { border-left-color: var(--inferencial); }
+        .question-inferencial .tag-nivel { color: var(--inferencial); font-weight: 700; }
+
+        .question-critico { border-left-color: var(--critico); }
+        .question-critico .tag-nivel { color: var(--critico); font-weight: 700; }
+
+        .options label { display: block; margin: 10px 0; padding: 14px 16px; background: white; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95rem; }
+        .options label:hover { border-color: var(--primary); background: #eff6ff; }
+        .options input { margin-right: 10px; }
+        
+        input[type="text"] { width: 100%; padding: 14px; margin-top: 8px; margin-bottom: 20px; background: #fff; border: 2px solid var(--border); border-radius: 10px; box-sizing: border-box; font-size: 1rem; transition: border-color 0.2s; }
+        input[type="text"]:focus { outline: none; border-color: var(--primary); }
+        
+        button { background: var(--primary); color: white; border: none; padding: 14px 20px; font-size: 1rem; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 600; transition: background 0.2s, transform 0.1s; margin-top: 15px; }
+        button:hover { background: var(--primary-dark); }
+        button:active { transform: scale(0.98); }
+        
+        .feedback-modal { margin-top: 15px; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 0.95rem; display: none; }
+        .feedback-success { background: #d1fae5; color: #065f46; border: 1px solid #a7f3d0; }
+        .feedback-error { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
+
+        .progress-container { width: 100%; background: var(--border); height: 8px; border-radius: 4px; margin-bottom: 25px; overflow: hidden; }
+        .progress-bar { background: var(--primary); height: 100%; width: 0%; transition: width 0.4s ease; }
+        
         .badge-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
-        .badge { background: #312e81; color: #c7d2fe; padding: 10px 18px; border-radius: 25px; font-weight: bold; font-size: 0.95rem; border: 1px solid #818cf8; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
-        .progress-bar { background: #0f172a; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
-        .progress-fill { background: var(--secondary); height: 100%; width: 25%; transition: width 0.3s; }
+        .badge { background: #eff6ff; color: #1e40af; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; border: 1px solid #bfdbfe; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🔓 Escape Room: Comprensión Lectora</h1>
-    <p class="subtitle">Supera las salas temáticas descifrando los enigmas literarios.</p>
+    <h1>Evaluación de Comprensión Lectora</h1>
+    <p class="subtitle">Niveles: Literal, Inferencial y Crítico[cite: 1]</p>
     
-    <div class="progress-bar">
-        <div class="progress-fill" id="progress"></div>
+    <div class="progress-container">
+        <div class="progress-bar" id="progress"></div>
     </div>
 
-    <!-- SALA 0: REGISTRO -->
-    <div id="room-0" class="room-box active">
-        <div class="story-box">
-            "Has quedado atrapado en la base de datos central de los textos. Para escapar y recuperar tu libertad académica, deberás demostrar tu dominio en los niveles Literal, Inferencial y Crítico a través de los desafíos."
+    <!-- PASO 0: REGISTRO -->
+    <div id="step-0" class="step-box active">
+        <div class="context-box">
+            Por favor, ingresa tu nombre completo para iniciar con el registro formal de la prueba evaluativa.
         </div>
-        <label for="student-name"><b>Nombre *</b></label>
-        <input type="text" id="student-name" required placeholder="Ingresa tu nombre completo">
-        <button onclick="siguienteSala(1)">¡Iniciar el Escape! 🚀</button>
+        <label for="student-name"><b>Nombre Completo:</b></label>
+        <input type="text" id="student-name" required placeholder="Ej. Carlos Andrés Pérez">
+        <button onclick="iniciarEvaluacion()">Comenzar Evaluación ➔</button>
     </div>
 
-    <!-- SALA 1: TEXTO 1 -->
-    <div id="room-1" class="room-box">
-        <h3>🧬 Sala 1: Texto 1 (Biología)</h3>
-        <div class="story-box">
+    <!-- PREGUNTA 1 (LITERAL) -->
+    <div id="step-1" class="step-box">
+        <div class="context-box">
             <b>Texto 1: El ciclo de la vida (Biología)</b><br>
-            Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente y comienzan a desarrollar pulmones. Finalmente, emergen a la tierra como ranas adultas, listas para explorar un mundo nuevo fuera del agua.
+            Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente y comienzan a desarrollar pulmones. Finalmente, emergen a la tierra como ranas adultas, listas para explorar un mundo nuevo fuera del agua.[cite: 1]
         </div>
-        
-        <div class="question-card">
-            <p><b>1. (Nivel Literal - Básico) ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q1" value="0"> Comienzan a caminar sobre el agua.</label>
-                <label><input type="radio" name="q1" value="0"> Sus pulmones desaparecen.</label>
-                <label><input type="radio" name="q1" value="10"> El método de respiración y su anatomía física.</label>
-                <label><input type="radio" name="q1" value="0"> Su dieta se vuelve exclusivamente acuática.</label>
-            </div>
+        <div class="question-title question-literal">1. (<span class="tag-nivel">Nivel Literal - Básico</span>) ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *[cite: 1]</div>
+        <div class="options">
+            <label><input type="radio" name="q1" value="Comienzan a caminar sobre el agua"> Comienzan a caminar sobre el agua.[cite: 1]</label>
+            <label><input type="radio" name="q1" value="Sus pulmones desaparecen"> Sus pulmones desaparecen.[cite: 1]</label>
+            <label><input type="radio" name="q1" value="El método de respiración y su anatomía física" data-correct="true"> El método de respiración y su anatomía física.[cite: 1]</label>
+            <label><input type="radio" name="q1" value="Su dieta se vuelve exclusivamente acuática"> Su dieta se vuelve exclusivamente acuática.[cite: 1]</label>
         </div>
-
-        <div class="question-card">
-            <p><b>2. (Nivel Inferencial - Intermedio) ¿Qué se puede deducir sobre el entorno de vida de las ranas? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q2" value="0"> Solo pueden vivir en entornos húmedos debido a su piel.</label>
-                <label><input type="radio" name="q2" value="10"> Son animales que necesitan adaptarse a dos medios distintos durante su vida.</label>
-                <label><input type="radio" name="q2" value="0"> Los renacuajos son más rápidos que las ranas adultas.</label>
-                <label><input type="radio" name="q2" value="0"> La metamorfosis ocurre solo en climas fríos.</label>
-            </div>
-        </div>
-        <button onclick="siguienteSala(2)">Desbloquear Sala 2 ➡</button>
+        <div id="feedback-1" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(1)">Siguiente Pregunta ➔</button>
     </div>
 
-    <!-- SALA 2: TEXTO 2 -->
-    <div id="room-2" class="room-box">
-        <h3>🏛️ Sala 2: Texto 2 (Historia)</h3>
-        <div class="story-box">
+    <!-- PREGUNTA 2 (INFERENCIAL) -->
+    <div id="step-2" class="step-box">
+        <div class="context-box">
+            <b>Texto 1: El ciclo de la vida (Biología)</b> (Continuación)
+        </div>
+        <div class="question-title question-inferencial">2. (<span class="tag-nivel">Nivel Inferencial - Intermedio</span>) ¿Qué se puede deducir sobre el entorno de vida de las ranas? *[cite: 2]</div>
+        <div class="options">
+            <label><input type="radio" name="q2" value="Solo pueden vivir en entornos húmedos debido a su piel"> Solo pueden vivir en entornos húmedos debido a su piel.[cite: 2]</label>
+            <label><input type="radio" name="q2" value="Son animales que necesitan adaptarse a dos medios distintos durante su vida" data-correct="true"> Son animales que necesitan adaptarse a dos medios distintos durante su vida.[cite: 2]</label>
+            <label><input type="radio" name="q2" value="Los renacuajos son más rápidos que las ranas adultas"> Los renacuajos son más rápidos que las ranas adultas.[cite: 2]</label>
+            <label><input type="radio" name="q2" value="La metamorfosis ocurre solo en climas fríos"> La metamorfosis ocurre solo en climas fríos.[cite: 2]</label>
+        </div>
+        <div id="feedback-2" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(2)">Siguiente Pregunta ➔</button>
+    </div>
+
+    <!-- PREGUNTA 3 (LITERAL) -->
+    <div id="step-3" class="step-box">
+        <div class="context-box">
             <b>Texto 2: El Nilo y Egipto (Historia)</b><br>
-            El Antiguo Egipto no habría sido la civilización esplendorosa que conocemos sin el río Nilo. Cada año, el río se desbordaba, cubriendo las tierras circundantes con un lodo fértil que permitía el cultivo de trigo y cebada. Los egipcios aprendieron a controlar estas crecidas mediante canales de riego, lo que les permitió tener excedentes de comida, tiempo para construir pirámides y desarrollar una sociedad compleja.
+            El Antiguo Egipto no habría sido la civilización esplendorosa que conocemos sin el río Nilo. Cada año, el río se desbordaba, cubriendo las tierras circundantes con un lodo fértil que permitía el cultivo de trigo y cebada. Los egipcios aprendieron a controlar estas crecidas mediante canales de riego, lo que les permitió tener excedentes de comida, tiempo para construir pirámides y desarrollar una sociedad compleja.[cite: 2]
         </div>
-        
-        <div class="question-card">
-            <p><b>3. (Nivel Literal - Básico) ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q3" value="0"> La construcción de las grandes pirámides de piedra.</label>
-                <label><input type="radio" name="q3" value="0"> La creación de canales de navegación rápidos.</label>
-                <label><input type="radio" name="q3" value="10"> El cultivo abundante de cereales como el trigo y la cebada.</label>
-                <label><input type="radio" name="q3" value="0"> La limpieza del agua para el consumo humano.</label>
-            </div>
+        <div class="question-title question-literal">3. (<span class="tag-nivel">Nivel Literal - Básico</span>) ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos? *[cite: 2]</div>
+        <div class="options">
+            <label><input type="radio" name="q3" value="La construcción de las grandes pirámides de piedra"> La construcción de las grandes pirámides de piedra.[cite: 2]</label>
+            <label><input type="radio" name="q3" value="La creación de canales de navegación rápidos"> La creación de canales de navegación rápidos.[cite: 2]</label>
+            <label><input type="radio" name="q3" value="El cultivo abundante de cereales como el trigo y la cebada" data-correct="true"> El cultivo abundante de cereales como el trigo y la cebada.[cite: 2]</label>
+            <label><input type="radio" name="q3" value="La limpieza del agua para el consumo humano"> La limpieza del agua para el consumo humano.[cite: 2]</label>
         </div>
-
-        <div class="question-card">
-            <p><b>4. (Nivel Crítico - Avanzado) ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q4" value="0"> Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.</label>
-                <label><input type="radio" name="q4" value="10"> Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.</label>
-                <label><input type="radio" name="q4" value="0"> Dificultó el progreso porque las inundaciones destruían constantemente las casas.</label>
-                <label><input type="radio" name="q4" value="0"> Solo sirvió como defensa natural contra los enemigos extranjeros.</label>
-            </div>
-        </div>
-        <button onclick="siguienteSala(3)">Desbloquear Sala 3 ➡</button>
+        <div id="feedback-3" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(3)">Siguiente Pregunta ➔</button>
     </div>
 
-    <!-- SALA 3: TEXTO 3 -->
-    <div id="room-3" class="room-box">
-        <h3>📱 Sala 3: Texto 3 (Sociedad)</h3>
-        <div class="story-box">
+    <!-- PREGUNTA 4 (CRÍTICO) -->
+    <div id="step-4" class="step-box">
+        <div class="context-box">
+            <b>Texto 2: El Nilo y Egipto (Historia)</b> (Continuación)
+        </div>
+        <div class="question-title question-critico">4. (<span class="tag-nivel">Nivel Crítico - Avanzado</span>) ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia? *[cite: 3]</div>
+        <div class="options">
+            <label><input type="radio" name="q4" value="Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar"> Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.[cite: 3]</label>
+            <label><input type="radio" name="q4" value="Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social" data-correct="true"> Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.[cite: 3]</label>
+            <label><input type="radio" name="q4" value="Dificultó el progreso porque las inundaciones destruían constantemente las casas"> Dificultó el progreso porque las inundaciones destruían constantemente las casas.[cite: 3]</label>
+            <label><input type="radio" name="q4" value="Solo sirvió como defensa natural contra los enemigos extranjeros"> Solo sirvió como defensa natural contra los enemigos extranjeros.[cite: 3]</label>
+        </div>
+        <div id="feedback-4" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(4)">Siguiente Pregunta ➔</button>
+    </div>
+
+    <!-- PREGUNTA 5 (INFERENCIAL) -->
+    <div id="step-5" class="step-box">
+        <div class="context-box">
             <b>Texto 3: El uso de la tecnología (Sociedad)</b><br>
-            El uso excesivo de dispositivos electrónicos antes de dormir se ha convertido en una preocupación de salud pública. La luz azul emitida por las pantallas engaña a nuestro cerebro haciéndole creer que aún es de día, lo que inhibe la producción de melatonina, la hormona encargada de inducir el sueño. Como resultado, muchos jóvenes reportan fatiga, falta de concentración en clases y mal humor durante el día.
+            El uso excesivo de dispositivos electrónicos antes de dormir se ha convertido en una preocupación de salud pública. La luz azul emitida por las pantallas engaña a nuestro cerebro haciéndole creer que aún es de día, lo que inhibe la producción de melatonina, la hormona encargada de inducir el sueño. Como resultado, muchos jóvenes reportan fatiga, falta de concentración en clases y mal humor durante el día.[cite: 3]
         </div>
-        
-        <div class="question-card">
-            <p><b>5. (Nivel Inferencial - Intermedio) ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q5" value="0"> La luz azul mejora la memoria a largo plazo.</label>
-                <label><input type="radio" name="q5" value="0"> No existe ninguna relación; el cansancio es solo una excusa.</label>
-                <label><input type="radio" name="q5" value="10"> La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo.</label>
-                <label><input type="radio" name="q5" value="0"> El uso de dispositivos es necesario para estudiar mejor.</label>
-            </div>
+        <div class="question-title question-inferencial">5. (<span class="tag-nivel">Nivel Inferencial - Intermedio</span>) ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar? *[cite: 3]</div>
+        <div class="options">
+            <label><input type="radio" name="q5" value="La luz azul mejora la memoria a largo plazo"> La luz azul mejora la memoria a largo plazo.[cite: 3]</label>
+            <label><input type="radio" name="q5" value="No existe ninguna relación; el cansancio es solo una excusa"> No existe ninguna relación; el cansancio es solo una excusa.[cite: 3]</label>
+            <label><input type="radio" name="q5" value="La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo" data-correct="true"> La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo.[cite: 3]</label>
+            <label><input type="radio" name="q5" value="El uso de dispositivos es necesario para estudiar mejor"> El uso de dispositivos es necesario para estudiar mejor.[cite: 3]</label>
         </div>
-
-        <div class="question-card">
-            <p><b>6. (Nivel Crítico - Avanzado) ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q6" value="0"> Promueve el uso de dispositivos como una forma de relajación.</label>
-                <label><input type="radio" name="q6" value="10"> Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.</label>
-                <label><input type="radio" name="q6" value="0"> Considera que la tecnología es la causa de todas las enfermedades modernas.</label>
-                <label><input type="radio" name="q6" value="0"> Sugiere que la melatonina no es importante para los jóvenes.</label>
-            </div>
-        </div>
-        <button onclick="siguienteSala(4)">Desbloquear Sala Final ➡</button>
+        <div id="feedback-5" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(5)">Siguiente Pregunta ➔</button>
     </div>
 
-    <!-- SALA 4: TEXTO 4 Y CIENCIA -->
-    <div id="room-4" class="room-box">
-        <h3>🌱 Sala 4: Textos 4 y 5 (Fábula y Ciencia)</h3>
-        <div class="story-box">
+    <!-- PREGUNTA 6 (CRÍTICO) -->
+    <div id="step-6" class="step-box">
+        <div class="context-box">
+            <b>Texto 3: El uso de la tecnología (Sociedad)</b> (Continuación)
+        </div>
+        <div class="question-title question-critico">6. (<span class="tag-nivel">Nivel Crítico - Avanzado</span>) ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir? *[cite: 4]</div>
+        <div class="options">
+            <label><input type="radio" name="q6" value="Promueve el uso de dispositivos como una forma de relajación"> Promueve el uso de dispositivos como una forma de relajación.[cite: 4]</label>
+            <label><input type="radio" name="q6" value="Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo" data-correct="true"> Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.[cite: 4]</label>
+            <label><input type="radio" name="q6" value="Considera que la tecnología es la causa de todas las enfermedades modernas"> Considera que la tecnología es la causa de todas las enfermedades modernas.[cite: 4]</label>
+            <label><input type="radio" name="q6" value="Sugiere que la melatonina no es importante para los jóvenes"> Sugiere que la melatonina no es importante para los jóvenes.[cite: 4]</label>
+        </div>
+        <div id="feedback-6" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(6)">Siguiente Pregunta ➔</button>
+    </div>
+
+    <!-- PREGUNTA 7 (LITERAL) -->
+    <div id="step-7" class="step-box">
+        <div class="context-box">
             <b>Texto 4: La semilla ambiciosa (Fábula)</b><br>
-            Una pequeña semilla cayó en tierra seca y dura. A su alrededor, las otras semillas se quejaban de la falta de agua, pero esta semilla decidió abrirse camino buscando las profundidades de la tierra, donde sabía que encontraría humedad. Años después, mientras las otras semillas habían desaparecido, aquella pequeña semilla se había convertido en un robusto árbol cuyas raíces profundas sostenían todo el jardín.<br><br>
-            <b>Exploración espacial (Ciencia)</b><br>
-            La exploración de Marte ha sido un sueño de la humanidad durante décadas. Los científicos argumentan que estudiar el planeta rojo podría revelar si alguna vez hubo vida allí o si, en el futuro, los humanos podrían habitarlo. Sin embargo, este proceso es extremadamente costoso y requiere una cooperación internacional sin precedentes, lo que genera debates sobre si ese dinero debería invertirse primero en solucionar problemas de la Tierra.
+            Una pequeña semilla cayó en tierra seca y dura. A su alrededor, las otras semillas se quejaban de la falta de agua, pero esta semilla decidió abrirse camino buscando las profundidades de la tierra, donde sabía que encontraría humedad. Años después, mientras las otras semillas habían desaparecido, aquella pequeña semilla se había convertido en un robusto árbol cuyas raíces profundas sostenían todo el jardín.[cite: 4]
         </div>
-        
-        <div class="question-card">
-            <p><b>7. (Nivel Literal - Básico) ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q7" value="0"> Se quedó quieta esperando que lloviera.</label>
-                <label><input type="radio" name="q7" value="10"> Intentó buscar agua en las profundidades de la tierra.</label>
-                <label><input type="radio" name="q7" value="0"> Se quejó junto con las otras semillas.</label>
-                <label><input type="radio" name="q7" value="0"> Se dejó llevar por el viento hacia otro lugar.</label>
-            </div>
+        <div class="question-title question-literal">7. (<span class="tag-nivel">Nivel Literal - Básico</span>) ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca? *[cite: 4]</div>
+        <div class="options">
+            <label><input type="radio" name="q7" value="Se quedó quieta esperando que lloviera"> Se quedó quieta esperando que lloviera.[cite: 4]</label>
+            <label><input type="radio" name="q7" value="Intentó buscar agua en las profundidades de la tierra" data-correct="true"> Intentó buscar agua en las profundidades de la tierra.[cite: 4]</label>
+            <label><input type="radio" name="q7" value="Se quejó junto con las otras semillas"> Se quejó junto con las otras semillas.[cite: 4]</label>
+            <label><input type="radio" name="q7" value="Se dejó llevar por el viento hacia otro lugar"> Se dejó llevar por el viento hacia otro lugar.[cite: 4]</label>
         </div>
-
-        <div class="question-card">
-            <p><b>8. (Nivel Inferencial - Intermedio) ¿Qué representa la acción de la semilla en esta historia? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q8" value="0"> La importancia de la suerte en la vida.</label>
-                <label><input type="radio" name="q8" value="10"> La necesidad de adaptarse y esforzarse para superar las dificultades.</label>
-                <label><input type="radio" name="q8" value="0"> Que las plantas son seres inteligentes que planean el futuro.</label>
-                <label><input type="radio" name="q8" value="0"> Que es mejor vivir en lugares cómodos que en lugares difíciles.</label>
-            </div>
-        </div>
-
-        <div class="question-card">
-            <p><b>9. (Nivel Inferencial - Intermedio) ¿Por qué la exploración de Marte es un tema de debate? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q9" value="0"> Porque no hay evidencia de que Marte sea un planeta interesante.</label>
-                <label><input type="radio" name="q9" value="0"> Porque los científicos no quieren cooperar entre sí.</label>
-                <label><input type="radio" name="q9" value="10"> Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes.</label>
-                <label><input type="radio" name="q9" value="0"> Porque el costo es bajo pero los riesgos son muy altos.</label>
-            </div>
-        </div>
-
-        <div class="question-card">
-            <p><b>10. (Nivel Crítico - Avanzado) ¿Cuál es el dilema principal que plantea el texto? *</b></p>
-            <div class="options">
-                <label><input type="radio" name="q10" value="0"> La tecnología actual es incapaz de llegar a Marte.</label>
-                <label><input type="radio" name="q10" value="10"> La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.</label>
-                <label><input type="radio" name="q10" value="0"> Marte es un planeta demasiado peligroso para los seres humanos.</label>
-                <label><input type="radio" name="q10" value="0"> La falta de interés de la población en la exploración espacial.</label>
-            </div>
-        </div>
-
-        <button onclick="finalizarEscape()">🔓 ¡Escapar del Sistema y Obtener Insignias! 🏆</button>
+        <div id="feedback-7" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(7)">Siguiente Pregunta ➔</button>
     </div>
 
-    <!-- PANTALLA DE VICTORIA -->
-    <div id="room-success" class="room-box" style="text-align: center;">
-        <h2 style="color: var(--secondary);">🎉 ¡MISIÓN CUMPLIDA! HAS ESCAPADO</h2>
-        <p id="score-text" style="font-size: 1.2rem; font-weight: bold; margin: 15px 0;"></p>
-        <h3>Insignias Desbloqueadas:</h3>
+    <!-- PREGUNTA 8 (INFERENCIAL) -->
+    <div id="step-8" class="step-box">
+        <div class="context-box">
+            <b>Texto 4: La semilla ambiciosa (Fábula)</b> (Continuación)
+        </div>
+        <div class="question-title question-inferencial">8. (<span class="tag-nivel">Nivel Inferencial - Intermedio</span>) ¿Qué representa la acción de la semilla en esta historia? *[cite: 5]</div>
+        <div class="options">
+            <label><input type="radio" name="q8" value="La importancia de la suerte en la vida"> La importancia de la suerte en la vida.[cite: 5]</label>
+            <label><input type="radio" name="q8" value="La necesidad de adaptarse y esforzarse para superar las dificultades" data-correct="true"> La necesidad de adaptarse y esforzarse para superar las dificultades.[cite: 5]</label>
+            <label><input type="radio" name="q8" value="Que las plantas son seres inteligentes que planean el futuro"> Que las plantas son seres inteligentes que planean el futuro.[cite: 5]</label>
+            <label><input type="radio" name="q8" value="Que es mejor vivir en lugares cómodos que en lugares difíciles"> Que es mejor vivir en lugares cómodos que en lugares difíciles.[cite: 5]</label>
+        </div>
+        <div id="feedback-8" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(8)">Siguiente Pregunta ➔</button>
+    </div>
+
+    <!-- PREGUNTA 9 (INFERENCIAL) -->
+    <div id="step-9" class="step-box">
+        <div class="context-box">
+            <b>Exploración espacial (Ciencia)</b><br>
+            La exploración de Marte ha sido un sueño de la humanidad durante décadas. Los científicos argumentan que estudiar el planeta rojo podría revelar si alguna vez hubo vida allí o si, en el futuro, los humanos podrían habitarlo. Sin embargo, este proceso es extremadamente costoso y requiere una cooperación internacional sin precedentes, lo que genera debates sobre si ese dinero debería invertirse primero en solucionar problemas de la Tierra.[cite: 5]
+        </div>
+        <div class="question-title question-inferencial">9. (<span class="tag-nivel">Nivel Inferencial - Intermedio</span>) ¿Por qué la exploración de Marte es un tema de debate? *[cite: 5]</div>
+        <div class="options">
+            <label><input type="radio" name="q9" value="Porque no hay evidencia de que Marte sea un planeta interesante"> Porque no hay evidencia de que Marte sea un planeta interesante.[cite: 5]</label>
+            <label><input type="radio" name="q9" value="Porque los científicos no quieren cooperar entre sí"> Porque los científicos no quieren cooperar entre sí.[cite: 5]</label>
+            <label><input type="radio" name="q9" value="Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes" data-correct="true"> Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes.[cite: 5]</label>
+            <label><input type="radio" name="q9" value="Porque el costo es bajo pero los riesgos son muy altos"> Porque el costo es bajo pero los riesgos son muy altos.[cite: 5]</label>
+        </div>
+        <div id="feedback-9" class="feedback-modal"></div>
+        <button onclick="siguientePregunta(9)">Siguiente Pregunta ➔</button>
+    </div>
+
+    <!-- PREGUNTA 10 (CRÍTICO) -->
+    <div id="step-10" class="step-box">
+        <div class="context-box">
+            <b>Exploración espacial (Ciencia)</b> (Continuación)
+        </div>
+        <div class="question-title question-critico">10. (<span class="tag-nivel">Nivel Crítico - Avanzado</span>) ¿Cuál es el dilema principal que plantea el texto? *[cite: 6]</div>
+        <div class="options">
+            <label><input type="radio" name="q10" value="La tecnología actual es incapaz de llegar a Marte"> La tecnología actual es incapaz de llegar a Marte.[cite: 6]</label>
+            <label><input type="radio" name="q10" value="La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales" data-correct="true"> La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.[cite: 6]</label>
+            <label><input type="radio" name="q10" value="Marte es un planeta demasiado peligroso para los seres humanos"> Marte es un planeta demasiado peligroso para los seres humanos.[cite: 6]</label>
+            <label><input type="radio" name="q10" value="La falta de interés de la población en la exploración espacial"> La falta de interés de la población en la exploración espacial.[cite: 6]</label>
+        </div>
+        <div id="feedback-10" class="feedback-modal"></div>
+        <button onclick="finalizarEvaluacion()">Finalizar y Enviar Reporte 🏆</button>
+    </div>
+
+    <!-- PANTALLA DE RESULTADOS -->
+    <div id="step-success" class="step-box" style="text-align: center;">
+        <h2 style="color: var(--primary);">Evaluación Concluida con Éxito</h2>
+        <p id="score-text" style="font-size: 1.25rem; font-weight: 600; margin: 20px 0;"></p>
+        <h3>Insignias Académicas Obtenidas:</h3>
         <div class="badge-container" id="badges-list"></div>
-        <p style="margin-top: 25px; color: #34d399; font-weight: bold;" id="status-envio"></p>
+        <p style="margin-top: 30px; color: var(--success); font-weight: 600;" id="status-envio">Enviando resultados al sistema institucional...</p>
     </div>
 </div>
 
 <script>
 let studentName = "";
+let respuestasEstudiante = {};
+let puntajeTotal = 0;
 
-function siguienteSala(roomNum) {
-    if(roomNum === 1) {
-        studentName = document.getElementById('student-name').value;
-        if(!studentName) {
-            alert('Por favor ingresa tu nombre para continuar.');
-            return;
-        }
+function iniciarEvaluacion() {
+    studentName = document.getElementById('student-name').value.trim();
+    if(!studentName) {
+        alert('Por favor ingrese su nombre completo para continuar.');
+        return;
     }
+    cambiarPaso(1);
+}
 
-    if(roomNum === 2) {
-        if(!document.querySelector('input[name="q1"]:checked') || !document.querySelector('input[name="q2"]:checked')) {
-            alert('Debes responder todas las preguntas de la Sala 1 para avanzar.');
-            return;
-        }
-    }
-    if(roomNum === 3) {
-        if(!document.querySelector('input[name="q3"]:checked') || !document.querySelector('input[name="q4"]:checked')) {
-            alert('Debes responder las preguntas de la Sala 2 para continuar.');
-            return;
-        }
-    }
-    if(roomNum === 4) {
-        if(!document.querySelector('input[name="q5"]:checked') || !document.querySelector('input[name="q6"]:checked')) {
-            alert('Debes responder las preguntas de la Sala 3 para continuar.');
-            return;
-        }
-    }
-
-    document.querySelectorAll('.room-box').forEach(el => el.classList.remove('active'));
-    document.getElementById(`room-${roomNum}`).classList.add('active');
-    document.getElementById('progress').style.width = (roomNum * 25) + '%';
+function cambiarPaso(paso) {
+    document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
+    document.getElementById(`step-${paso}`).classList.add('active');
+    document.getElementById('progress').style.width = ((paso - 1) / 10) * 100 + '%';
     window.scrollTo(0, 0);
 }
 
-function finalizarEscape() {
-    let questions = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10'];
-    let answeredAll = true;
-    questions.forEach(q => {
-        if(!document.querySelector(`input[name="${q}"]:checked`)) answeredAll = false;
-    });
-
-    if(!answeredAll) {
-        alert('Te faltan preguntas por responder en esta última sala.');
+function siguientePregunta(numQ) {
+    const seleccionada = document.querySelector(`input[name="q${numQ}"]:checked`);
+    const feedbackBox = document.getElementById(`feedback-${numQ}`);
+    
+    if(!seleccionada) {
+        alert('Debe seleccionar una opción de respuesta antes de avanzar.');
         return;
     }
 
-    let totalScore = 0;
-    questions.forEach(q => {
-        const selected = document.querySelector(`input[name="${q}"]:checked`);
-        if(selected) totalScore += parseInt(selected.value);
-    });
+    respuestasEstudiante[`q${numQ}`] = seleccionada.value;
+    const esCorrecta = seleccionada.getAttribute('data-correct') === 'true';
+    
+    if(esCorrecta) {
+        puntajeTotal += 10;
+        feedbackBox.className = "feedback-modal feedback-success";
+        feedbackBox.innerHTML = "😃 ¡Excelente! Respuesta correcta (+10 puntos)";
+    } else {
+        feedbackBox.className = "feedback-modal feedback-error";
+        feedbackBox.innerHTML = "🤔 Respuesta incorrecta. ¡Ánimo para la siguiente!";
+    }
+    feedbackBox.style.display = "block";
+
+    setTimeout(() => {
+        cambiarPaso(numQ + 1);
+    }, 1200);
+}
+
+function finalizarEvaluacion() {
+    const seleccionada = document.querySelector('input[name="q10"]:checked');
+    
+    if(!seleccionada) {
+        alert('Debe seleccionar una opción de respuesta.');
+        return;
+    }
+
+    respuestasEstudiante['q10'] = seleccionada.value;
+    const esCorrecta = seleccionada.getAttribute('data-correct') === 'true';
+    
+    if(esCorrecta) {
+        puntajeTotal += 10;
+    }
 
     let badges = [];
-    if(totalScore >= 30) badges.push("🥉 Explorador Literal");
-    if(totalScore >= 40) badges.push("🥈 Pensador Inferencial");
-    if(totalScore >= 30) badges.push("🥇 Crítico Maestro");
-    if(totalScore == 100) badges.push("👑 Leyenda del Escape Lector");
+    if(puntajeTotal >= 30) badges.push("Explorador Literal");
+    if(puntajeTotal >= 40) badges.push("Pensador Inferencial");
+    if(puntajeTotal >= 30) badges.push("Crítico Maestro");
+    if(puntajeTotal === 100) badges.push("Leyenda de la Comprensión Lectora");
 
-    document.querySelectorAll('.room-box').forEach(el => el.classList.remove('active'));
-    document.getElementById('room-success').classList.add('active');
+    cambiarPaso('success');
     document.getElementById('progress').style.width = '100%';
-    document.getElementById('score-text').innerText = `¡Excelente trabajo, ${studentName}!\nPuntaje Final: ${totalScore} / 100 puntos`;
+    document.getElementById('score-text').innerText = `Estudiante: ${studentName}\nPuntaje Final: ${puntajeTotal} / 100 Puntos`;
 
     let badgeHtml = '';
-    badges.pop(); // Evita duplicados visuales si aplica
-    badges.forEach(b => { badgeHtml += `<div class="badge">${b}</div>`; });
+    badges.forEach(b => { badgeHtml += `<div class="badge">🏆 ${b}</div>`; });
     document.getElementById('badges-list').innerHTML = badgeHtml;
 
-    // Envío automático al Google Sheet con tu URL real
     const urlScript = "https://script.google.com/macros/s/AKfycby8c2lm6fFQx9tGEENB_LHzbvxqTAEJgwvnRTxUmuycSdvrURN6qPkfKiJUWeEBKqTOfw/exec"; 
     
+    const datosEnvio = {
+        name: studentName,
+        score: puntajeTotal,
+        badges: badges.join(", "),
+        p1: respuestasEstudiante['q1'] || "Sin responder",
+        p2: respuestasEstudiante['q2'] || "Sin responder",
+        p3: respuestasEstudiante['q3'] || "Sin responder",
+        p4: respuestasEstudiante['q4'] || "Sin responder",
+        p5: respuestasEstudiante['q5'] || "Sin responder",
+        p6: respuestasEstudiante['q6'] || "Sin responder",
+        p7: respuestasEstudiante['q7'] || "Sin responder",
+        p8: respuestasEstudiante['q8'] || "Sin responder",
+        p9: respuestasEstudiante['q9'] || "Sin responder",
+        p10: respuestasEstudiante['q10'] || "Sin responder"
+    };
+
     fetch(urlScript, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: studentName, score: totalScore, badges: badges.join(", ") })
+        body: JSON.stringify(datosEnvio)
     }).then(() => {
-        document.getElementById('status-envio').innerText = "✅ ¡Datos registrados con éxito en el reporte del docente!";
+        document.getElementById('status-envio').innerText = "✅ Registro desglosado enviado y almacenado correctamente en el sistema.";
     }).catch(() => {
-        document.getElementById('status-envio').innerText = "⚠️ Completado, pero hubo un pequeño error al conectar con el reporte.";
+        document.getElementById('status-envio').innerText = "⚠️ Evaluación finalizada localmente. Error de enlace con el servidor de reportes.";
     });
 }
 </script>
