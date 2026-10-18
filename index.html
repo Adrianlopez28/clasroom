@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escape Room: El Misterio de la Lectura</title>
+    <style>
+        :root { --primary: #7c3aed; --secondary: #06b6d4; --bg: #0f172a; --card-bg: #1e293b; --text: #f8fafc; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 750px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { color: var(--secondary); text-align: center; font-size: 2rem; margin-bottom: 5px; }
+        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 25px; }
+        .room-box { display: none; }
+        .room-box.active { display: block; animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .story-box { background: #0f172a; padding: 15px; border-left: 5px solid var(--secondary); border-radius: 6px; margin-bottom: 20px; font-style: italic; color: #cbd5e1; }
+        .question-card { background: #334155; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+        .options label { display: block; margin: 8px 0; padding: 12px; background: #1e293b; border: 1px solid #475569; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+        .options label:hover { background: #475569; border-color: var(--secondary); }
+        input[type="text"] { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 15px; background: #0f172a; border: 1px solid #475569; color: white; border-radius: 6px; box-sizing: border-box; }
+        button { background: var(--secondary); color: #0f172a; border: none; padding: 14px 20px; font-size: 1rem; border-radius: 8px; cursor: pointer; width: 100%; font-weight: bold; transition: background 0.2s; }
+        button:hover { background: #22d3ee; }
+        .badge-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+        .badge { background: #312e81; color: #c7d2fe; padding: 10px 18px; border-radius: 25px; font-weight: bold; font-size: 0.95rem; border: 1px solid #818cf8; box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3); }
+        .progress-bar { background: #0f172a; height: 10px; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
+        .progress-fill { background: var(--secondary); height: 100%; width: 25%; transition: width 0.3s; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔓 Escape Room: Código Lector</h1>
+    <p class="subtitle">Supera las 4 salas temáticas descifrando los enigmas literarios.</p>
+    
+    <div class="progress-bar">
+        <div class="progress-fill" id="progress"></div>
+    </div>
+
+    <!-- SALA 0: REGISTRO -->
+    <div id="room-0" class="room-box active">
+        <div class="story-box">
+            "Has quedado atrapado en la base de datos central de los textos perdidos. Para escapar y recuperar tu libertad académica, deberás demostrar tu dominio en los niveles Literal, Inferencial y Crítico a través de 4 desafíos."
+        </div>
+        <label for="student-name"><b>Ingresa tu Nombre Completo para iniciar la misión:</b></label>
+        <input type="text" id="student-name" required placeholder="Ej. Carlos Mendoza">
+        <button onclick="siguienteSala(1)">¡Iniciar el Escape! 🚀</button>
+    </div>
+
+    <!-- SALA 1: EL LABORATORIO DE BIOLOGÍA -->
+    <div id="room-1" class="room-box">
+        <h3>🧬 Sala 1: El Laboratorio de Biología (Texto 1)</h3>
+        <div class="story-box">Las puertas automáticas están bloquedas por el ciclo de las ranas. Analiza el comportamiento anfibio para abrir el primer cerrojo.</div>
+        
+        <div class="question-card">
+            <p><b>1. (Literal)</b> ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas?[cite: 1]</p>
+            <div class="options">
+                <label><input type="radio" name="q1" value="0"> Comienzan a caminar sobre el agua.[cite: 1]</label>
+                <label><input type="radio" name="q1" value="0"> Sus pulmones desaparecen.[cite: 1]</label>
+                <label><input type="radio" name="q1" value="10"> El método de respiración y su anatomía física.[cite: 1]</label>
+                <label><input type="radio" name="q1" value="0"> Su dieta se vuelve exclusivamente acuática.[cite: 1]</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <p><b>2. (Inferencial)</b> ¿Qué se puede deducir sobre el entorno de vida de las ranas?[cite: 2]</p>
+            <div class="options">
+                <label><input type="radio" name="q2" value="0"> Solo pueden vivir en entornos húmedos debido a su piel.[cite: 2]</label>
+                <label><input type="radio" name="q2" value="10"> Son animales que necesitan adaptarse a dos medios distintos durante su vida.[cite: 2]</label>
+                <label><input type="radio" name="q2" value="0"> Los renacuajos son más rápidos que las ranas adultas.[cite: 2]</label>
+                <label><input type="radio" name="q2" value="0"> La metamorfosis ocurre solo en climas fríos.[cite: 2]</label>
+            </div>
+        </div>
+        <button onclick="siguienteSala(2)">Desbloquear Sala 2 ➡</button>
+    </div>
+
+    <!-- SALA 2: LAS ORILLAS DEL NILO (HISTORIA) -->
+    <div id="room-2" class="room-box">
+        <h3>🏛️ Sala 2: Las Orillas del Nilo (Texto 2)</h3>
+        <div class="story-box">Has entrado a la cámara de los faraones. El río sagrado oculta la clave para descifrar la geografía y la agricultura ancestral.</div>
+        
+        <div class="question-card">
+            <p><b>3. (Literal)</b> ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos?[cite: 2]</p>
+            <div class="options">
+                <label><input type="radio" name="q3" value="0"> La construcción de las grandes pirámides de piedra.[cite: 2]</label>
+                <label><input type="radio" name="q3" value="0"> La creación de canales de navegación rápidos.[cite: 2]</label>
+                <label><input type="radio" name="q3" value="10"> El cultivo abundante de cereales como el trigo y la cebada.[cite: 2]</label>
+                <label><input type="radio" name="q3" value="0"> La limpieza del agua para el consumo humano.[cite: 2]</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <p><b>4. (Crítico)</b> ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia?[cite: 3]</p>
+            <div class="options">
+                <label><input type="radio" name="q4" value="0"> Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.[cite: 3]</label>
+                <label><input type="radio" name="q4" value="10"> Fue un factor determinante, pues sin el ciclo natural del río, la agricultura no habría permitido el crecimiento social.[cite: 3]</label>
+                <label><input type="radio" name="q4" value="0"> Dificultó el progreso porque las inundaciones destruían constantemente las casas.[cite: 3]</label>
+                <label><input type="radio" name="q4" value="0"> Solo sirvió como defensa natural contra los enemigos extranjeros.[cite: 3]</label>
+            </div>
+        </div>
+        <button onclick="siguienteSala(3)">Desbloquear Sala 3 ➡</button>
+    </div>
+
+    <!-- SALA 3: EL CIBERESPACIO Y LA SOCIEDAD -->
+    <div id="room-3" class="room-box">
+        <h3>📱 Sala 3: El Ciberespacio (Texto 3)</h3>
+        <div class="story-box">Una pantalla brillante emite luz azul y bloquea los circuitos. Debes resolver el dilema del sueño y la tecnología para avanzar.</div>
+        
+        <div class="question-card">
+            <p><b>5. (Inferencial)</b> ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar?[cite: 3]</p>
+            <div class="options">
+                <label><input type="radio" name="q5" value="0"> La luz azul mejora la memoria a largo plazo.[cite: 3]</label>
+                <label><input type="radio" name="q5" value="0"> No existe ninguna relación; el cansancio es solo una excusa.[cite: 3]</label>
+                <label><input type="radio" name="q5" value="10"> La falta de sueño de calidad afecta directamente la capacidad de atención y el ánimo.[cite: 3]</label>
+                <label><input type="radio" name="q5" value="0"> El uso de dispositivos es necesario para estudiar mejor.[cite: 3]</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <p><b>6. (Crítico)</b> ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir?[cite: 4]</p>
+            <div class="options">
+                <label><input type="radio" name="q6" value="0"> Promueve el uso de dispositivos como una forma de relajación.[cite: 4]</label>
+                <label><input type="radio" name="q6" value="10"> Advierte sobre un hábito nocivo que afecta el bienestar físico y cognitivo.[cite: 4]</label>
+                <label><input type="radio" name="q6" value="0"> Considera que la tecnología es la causa de todas las enfermedades modernas.[cite: 4]</label>
+                <label><input type="radio" name="q6" value="0"> Sugiere que la melatonina no es importante para los jóvenes.[cite: 4]</label>
+            </div>
+        </div>
+        <button onclick="siguienteSala(4)">Desbloquear Sala Final ➡</button>
+    </div>
+
+    <!-- SALA 4: EL JARDÍN Y EL ESPACIO (FÁBULA Y CIENCIA) -->
+    <div id="room-4" class="room-box">
+        <h3>🌱 Sala 4: El Jardín Oculto y el Cosmos (Textos 4 y 5)</h3>
+        <div class="story-box">¡Última sala! Demuestra la resiliencia de la semilla y el dilema espacial para desactivar la seguridad y escapar por completo.</div>
+        
+        <div class="question-card">
+            <p><b>7. (Literal)</b> ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca?[cite: 4]</p>
+            <div class="options">
+                <label><input type="radio" name="q7" value="0"> Se quedó quieta esperando que lloviera.[cite: 4]</label>
+                <label><input type="radio" name="q7" value="10"> Intentó buscar agua en las profundidades de la tierra.[cite: 4]</label>
+                <label><input type="radio" name="q7" value="0"> Se quejó junto con las otras semillas.[cite: 4]</label>
+                <label><input type="radio" name="q7" value="0"> Se dejó llevar por el viento hacia otro lugar.[cite: 4]</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <p><b>8. (Inferencial)</b> ¿Qué representa la acción de la semilla en esta historia?[cite: 5]</p>
+            <div class="options">
+                <label><input type="radio" name="q8" value="0"> La importancia de la suerte en la vida.[cite: 5]</label>
+                <label><input type="radio" name="q8" value="10"> La necesidad de adaptarse y esforzarse para superar las dificultades.[cite: 5]</label>
+                <label><input type="radio" name="q8" value="0"> Que las plantas son seres inteligentes que planean el futuro.[cite: 5]</label>
+                <label><input type="radio" name="q8" value="0"> Que es mejor vivir en lugares cómodos que en lugares difíciles.[cite: 5]</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <p><b>9. (Inferencial)</b> ¿Por qué la exploración de Marte es un tema de debate?[cite: 5]</p>
+            <div class="options">
+                <label><input type="radio" name="q9" value="0"> Porque no hay evidencia de que Marte sea un planeta interesante.[cite: 5]</label>
+                <label><input type="radio" name="q9" value="0"> Porque los científicos no quieren cooperar entre sí.[cite: 5]</label>
+                <label><input type="radio" name="q9" value="10"> Debido a la tensión entre el deseo de descubrir nuevos horizontes y la necesidad de priorizar problemas terrestres urgentes.[cite: 5]</label>
+                <label><input type="radio" name="q9" value="0"> Porque el costo es bajo pero los riesgos son muy altos.[cite: 5]</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <p><b>10. (Crítico)</b> ¿Cuál es el dilema principal que plantea el texto?[cite: 6]</p>
+            <div class="options">
+                <label><input type="radio" name="q10" value="0"> La tecnología actual es incapaz de llegar a Marte.[cite: 6]</label>
+                <label><input type="radio" name="q10" value="10"> La diferencia entre el costo económico y el valor del conocimiento científico frente a las necesidades sociales.[cite: 6]</label>
+                <label><input type="radio" name="q10" value="0"> Marte es un planeta demasiado peligroso para los seres humanos.[cite: 6]</label>
+                <label><input type="radio" name="q10" value="0"> La falta de interés de la población en la exploración espacial.[cite: 6]</label>
+            </div>
+        </div>
+
+        <button onclick="finalizarEscape()">🔓 ¡Escapar del Sistema y Obtener Insignias! 🏆</button>
+    </div>
+
+    <!-- PANTALLA DE VICTORIA -->
+    <div id="room-success" class="room-box" style="text-align: center;">
+        <h2 style="color: var(--secondary);">🎉 ¡MISIÓN CUMPLIDA! HAS ESCAPADO</h2>
+        <p id="score-text" style="font-size: 1.2rem; font-weight: bold; margin: 15px 0;"></p>
+        <h3>Insignias Desbloqueadas en tu Huida:</h3>
+        <div class="badge-container" id="badges-list"></div>
+        <p style="margin-top: 25px; color: #34d399; font-weight: bold;" id="status-envio"></p>
+    </div>
+</div>
+
+<script>
+let currentRoom = 0;
+let studentName = "";
+
+function siguienteSala(roomNum) {
+    if(roomNum === 1) {
+        studentName = document.getElementById('student-name').value;
+        if(!studentName) {
+            alert('Por favor ingresa tu nombre para activar el protocolo de escape.');
+            return;
+        }
+    }
+
+    // Validar preguntas de la sala actual antes de avanzar
+    if(roomNum === 2) {
+        if(!document.querySelector('input[name="q1"]:checked') || !document.querySelector('input[name="q2"]:checked')) {
+            alert('Debes responder todas las preguntas de la Sala 1 para hackear la puerta.');
+            return;
+        }
+    }
+    if(roomNum === 3) {
+        if(!document.querySelector('input[name="q3"]:checked') || !document.querySelector('input[name="q4"]:checked')) {
+            alert('Debes resolver los enigmas de la Sala 2 para continuar.');
+            return;
+        }
+    }
+    if(roomNum === 4) {
+        if(!document.querySelector('input[name="q5"]:checked') || !document.querySelector('input[name="q6"]:checked')) {
+            alert('Debes responder las preguntas de la Sala 3 para desbloquear el sector final.');
+            return;
+        }
+    }
+
+    document.querySelectorAll('.room-box').forEach(el => el.classList.remove('active'));
+    document.getElementById(`room-${roomNum}`).classList.add('active');
+    document.getElementById('progress').style.width = (roomNum * 25) + '%';
+    window.scrollTo(0, 0);
+}
+
+function finalizarEscape() {
+    let questions = ['q1', 'q2', 'q3', 'q4', 'q5', 'q6', 'q7', 'q8', 'q9', 'q10'];
+    let answeredAll = true;
+    questions.forEach(q => {
+        if(!document.querySelector(`input[name="${q}"]:checked`)) answeredAll = false;
+    });
+
+    if(!answeredAll) {
+        alert('Te faltan preguntas por responder en esta última sala para completar la huida.');
+        return;
+    }
+
+    let totalScore = 0;
+    questions.forEach(q => {
+        const selected = document.querySelector(`input[name="${q}"]:checked`);
+        if(selected) totalScore += parseInt(selected.value);
+    });
+
+    let badges = [];
+    if(totalScore >= 30) badges.push("🥉 Explorador Literal");
+    if(totalScore >= 40) badges.push("🥈 Pensador Inferencial");
+    if(totalScore >= 30) badges.push("🥇 Crítico Maestro");
+    if(totalScore == 100) badges.push("👑 Leyenda del Escape Lector");
+
+    document.querySelectorAll('.room-box').forEach(el => el.classList.remove('active'));
+    document.getElementById('room-success').classList.add('active');
+    document.getElementById('progress').style.width = '100%';
+    document.getElementById('score-text').innerText = `¡Agente ${studentName}!\nPuntaje Final: ${totalScore} / 100 puntos`;
+
+    let badgeHtml = '';
+    badges.forEach(b => { badgeHtml += `<div class="badge">${b}</div>`; });
+    document.getElementById('badges-list').innerHTML = badgeHtml;
+
+    // Reporte automático a Google Sheets
+    const urlScript = "TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI"; 
+    
+    if(urlScript !== "TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI") {
+        fetch(urlScript, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: studentName, score: totalScore, badges: badges.join(", ") })
+        }).then(() => {
+            document.getElementById('status-envio').innerText = "✅ ¡Datos de escape registrados con éxito en el sistema del docente!";
+        }).catch(() => {
+            document.getElementById('status-envio').innerText = "⚠️ Completado localmente, error de conexión con la base de datos.";
+        });
+    } else {
+        document.getElementById('status-envio').innerText = "💡 (Modo prueba: Configura tu Google Apps Script para guardar los reportes automáticamente)";
+    }
+}
+</script>
+
+</body>
+</html>
