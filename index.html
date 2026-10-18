@@ -4,123 +4,264 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Escalera del Saber - Comprensión Lectora</title>
-    <!-- Librería para el confeti -->
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         :root { 
             --primary: #2563eb; 
-            --primary-dark: #1d4ed8; 
-            --bg: #0f172a; 
-            --card-bg: #1e293b; 
-            --text: #f8fafc; 
-            --border: #334155;
+            --bg-main: #0f172a; 
+            --card-bg: #ffffff; 
+            --text-dark: #0f172a; 
+            --text-muted: #64748b;
+            --border-light: #e2e8f0;
             
-            --literal: #2e7d32;
-            --inferencial: #1565c0;
-            --critico: #6a1b9a;
-        }
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 800px; background: var(--card-bg); padding: 30px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.4); border: 1px solid var(--border); box-sizing: border-box; }
-        h1 { color: #38bdf8; text-align: center; font-size: 1.8rem; margin-top: 0; margin-bottom: 5px; }
-        .subtitle { text-align: center; color: #94a3b8; margin-bottom: 20px; font-size: 0.95rem; }
+            /* Temas por Nivel */
+            --literal-color: #059669;
+            --literal-bg: #ecfdf5;
+            --literal-border: #a7f3d0;
 
-        /* Estilos del Mapa de Escalera */
-        .staircase-map { display: flex; flex-direction: column-reverse; gap: 8px; margin-bottom: 25px; padding: 15px; background: #0f172a; border-radius: 12px; max-height: 220px; overflow-y: auto; }
-        .stair-step { display: flex; align-items: center; justify-content: space-between; padding: 8px 15px; background: #1e293b; border-radius: 8px; font-size: 0.85rem; border: 1px solid #334155; transition: all 0.3s; }
-        .stair-step.active { background: #334155; border-color: #38bdf8; font-weight: bold; transform: scale(1.02); }
-        .stair-step.completed { background: #065f46; border-color: #34d399; color: #d1fae5; }
+            --inferencial-color: #2563eb;
+            --inferencial-bg: #eff6ff;
+            --inferencial-border: #bfdbfe;
+
+            --critico-color: #7c3aed;
+            --critico-bg: #faf5ff;
+            --critico-border: #e9d5ff;
+
+            /* Nivel activo por defecto */
+            --current-theme: var(--literal-color);
+            --current-bg: var(--literal-bg);
+            --current-border: var(--literal-border);
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+            background: var(--bg-main); 
+            color: #f8fafc; 
+            margin: 0; 
+            padding: 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .container { 
+            width: 100%; 
+            max-width: 820px; 
+            background: #1e293b; 
+            padding: 30px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
+            border: 2px solid #334155; 
+            box-sizing: border-box; 
+        }
+
+        h1 { 
+            color: #38bdf8; 
+            text-align: center; 
+            font-size: 1.8rem; 
+            margin: 0 0 5px 0; 
+            font-weight: 800;
+        }
         
-        /* Avatar y Estrellas */
-        .avatar-hud { display: flex; align-items: center; justify-content: center; gap: 15px; background: #111827; padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #374155; }
-        .avatar-icon { font-size: 2.5rem; position: relative; }
-        .avatar-stars { font-size: 1.2rem; }
-        .avatar-info { text-align: left; }
-        .avatar-name { font-weight: bold; color: #f3f4f6; font-size: 1.1rem; }
-        .avatar-score { color: #38bdf8; font-size: 0.9rem; }
+        .subtitle { 
+            text-align: center; 
+            color: #94a3b8; 
+            margin-bottom: 20px; 
+            font-size: 0.95rem; 
+        }
+
+        /* Marcador HUD */
+        .hud-bar { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #0f172a; 
+            padding: 12px 20px; 
+            border-radius: 12px; 
+            margin-bottom: 15px; 
+            border: 1px solid #334155; 
+        }
+        
+        .hud-user { font-weight: 700; color: #f8fafc; font-size: 1.05rem; }
+        .hud-stats { display: flex; gap: 15px; align-items: center; }
+        .hud-score { color: #f59e0b; font-weight: 800; font-size: 1.1rem; }
+        .hud-stars { font-size: 1.2rem; }
+
+        /* Canvas Escenario */
+        .game-canvas-container { 
+            width: 100%; 
+            height: 200px; 
+            background: #000000; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            border: 3px solid var(--current-theme); 
+            transition: border-color 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        canvas { width: 100%; height: 100%; display: block; }
 
         .step-box { display: none; }
-        .step-box.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        .step-box.active { display: block; animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
-        
-        .context-box { background: #0f172a; padding: 18px; border-left: 4px solid #38bdf8; border-radius: 8px; margin-bottom: 20px; font-size: 0.95rem; line-height: 1.6; color: #cbd5e1; }
-        
-        .question-card { padding: 22px; border-radius: 12px; margin-bottom: 20px; border: 2px solid; color: #0f172a; }
-        .card-literal { background-color: #e8f5e9; border-color: #a5d6a7; }
-        .card-inferencial { background-color: #e3f2fd; border-color: #90caf9; }
-        .card-critico { background-color: #f3e5f5; border-color: #ce93d8; }
 
-        .badge-nivel { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; color: white; }
-        .badge-literal { background-color: var(--literal); }
-        .badge-inferencial { background-color: var(--inferencial); }
-        .badge-critico { background-color: var(--critico); }
+        .context-box { 
+            background: #0f172a; 
+            padding: 18px; 
+            border-left: 5px solid var(--current-theme); 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            font-size: 0.98rem; 
+            line-height: 1.6; 
+            color: #e2e8f0; 
+            transition: border-color 0.4s ease;
+        }
 
-        .question-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 15px; color: #1e293b; }
+        /* Tarjeta de Pregunta con colores por nivel */
+        .question-card { 
+            padding: 24px; 
+            border-radius: 14px; 
+            margin-bottom: 20px; 
+            background-color: var(--current-bg); 
+            border: 2px solid var(--current-border); 
+            transition: all 0.4s ease;
+        }
 
-        .options label { display: block; margin: 10px 0; padding: 14px 16px; background: white; border: 2px solid #cbd5e1; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; font-size: 0.95rem; color: #1e293b; }
-        .options label:hover { border-color: #2563eb; background: #f8fafc; }
-        .options input { margin-right: 10px; }
-        
-        input[type="text"] { width: 100%; padding: 14px; margin-top: 8px; margin-bottom: 20px; background: #0f172a; border: 2px solid #475569; color: white; border-radius: 10px; box-sizing: border-box; font-size: 1rem; }
-        input[type="text"]:focus { outline: none; border-color: #38bdf8; }
-        
-        button { background: #38bdf8; color: #0f172a; border: none; padding: 14px 20px; font-size: 1rem; border-radius: 10px; cursor: pointer; width: 100%; font-weight: 700; transition: background 0.2s; margin-top: 15px; }
-        button:hover { background: #0ea5e9; }
-        
-        .feedback-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; animation: fadeIn 0.3s ease; }
-        .feedback-content { background: #1e293b; color: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 20px 35px rgba(0,0,0,0.5); max-width: 400px; width: 90%; border: 1px solid #334155; }
-        .feedback-emoji { font-size: 5rem; margin-bottom: 15px; }
-        .feedback-text { font-size: 1.5rem; font-weight: 700; margin-bottom: 10px; color: #38bdf8; }
+        .badge-nivel { 
+            display: inline-block; 
+            padding: 6px 12px; 
+            border-radius: 20px; 
+            font-size: 0.8rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            margin-bottom: 12px; 
+            color: #ffffff; 
+            background-color: var(--current-theme);
+            transition: background-color 0.4s ease;
+        }
+
+        .question-title { 
+            font-size: 1.1rem; 
+            font-weight: 700; 
+            margin-bottom: 18px; 
+            color: var(--text-dark); 
+            line-height: 1.4;
+        }
+
+        .options label { 
+            display: flex;
+            align-items: center;
+            margin: 10px 0; 
+            padding: 14px 18px; 
+            background: #ffffff; 
+            border: 2px solid var(--border-light); 
+            border-radius: 10px; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+            font-size: 0.95rem; 
+            color: var(--text-dark); 
+            font-weight: 500;
+        }
+
+        .options label:hover { 
+            border-color: var(--current-theme); 
+            background: #f8fafc; 
+            transform: translateX(4px);
+        }
+
+        .options input { margin-right: 12px; transform: scale(1.2); }
+
+        input[type="text"] { 
+            width: 100%; 
+            padding: 14px; 
+            margin-top: 8px; 
+            margin-bottom: 20px; 
+            background: #0f172a; 
+            border: 2px solid #475569; 
+            color: #ffffff; 
+            border-radius: 10px; 
+            box-sizing: border-box; 
+            font-size: 1rem; 
+        }
+
+        button { 
+            background: var(--current-theme); 
+            color: #ffffff; 
+            border: none; 
+            padding: 16px 20px; 
+            font-size: 1.05rem; 
+            border-radius: 10px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-weight: 700; 
+            transition: all 0.2s ease; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        button:hover { filter: brightness(1.15); transform: translateY(-2px); }
+
+        /* Modal Overlay */
+        .feedback-overlay { 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(15, 23, 42, 0.85); 
+            display: none; 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 1000; 
+        }
+
+        .feedback-content { 
+            background: #1e293b; 
+            color: white; 
+            padding: 35px; 
+            border-radius: 20px; 
+            text-align: center; 
+            max-width: 400px; 
+            width: 90%; 
+            border: 2px solid #334155; 
+        }
+
+        .feedback-emoji { font-size: 4.5rem; margin-bottom: 10px; }
+        .feedback-text { font-size: 1.4rem; font-weight: 800; margin-bottom: 8px; color: #38bdf8; }
         .feedback-sub { font-size: 1rem; color: #94a3b8; }
 
-        .progress-container { width: 100%; background: var(--border); height: 8px; border-radius: 4px; margin-bottom: 25px; overflow: hidden; }
-        .progress-bar { background: #38bdf8; height: 100%; width: 0%; transition: width 0.4s ease; }
-
         .badge-container { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
-        .badge { background: #1e293b; color: #38bdf8; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; border: 1px solid #334155; }
+        .badge { background: #0f172a; color: #38bdf8; padding: 10px 18px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; border: 1px solid #334155; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h1>La Escalera del Saber</h1>
-    <p class="subtitle">Asciende peldaño a peldaño dominando la comprensión lectora</p>
+    <p class="subtitle">Asciende peldaño a peldaño en la ruta de comprensión lectora</p>
 
-    <div class="progress-container">
-        <div class="progress-bar" id="progress"></div>
-    </div>
-    
-    <!-- HUD DEL AVATAR -->
-    <div id="hud-section" class="avatar-hud" style="display: none;">
-        <div class="avatar-icon">🎒<span id="hud-stars" style="position: absolute; top: -10px; right: -10px; font-size: 1rem;">⭐</span></div>
-        <div class="avatar-info">
-            <div class="avatar-name" id="hud-name">Estudiante</div>
-            <div class="avatar-score" id="hud-score">Puntaje: 0 pts | Escalón 1/10</div>
+    <!-- Marcador de estado -->
+    <div id="hud-bar" class="hud-bar" style="display: none;">
+        <div class="hud-user">🎒 <span id="hud-name">Estudiante</span></div>
+        <div class="hud-stats">
+            <span id="hud-stars" class="hud-stars">⭐</span>
+            <span id="hud-score" class="hud-score">0 / 100 pts</span>
         </div>
     </div>
 
-    <!-- MAPA DE ESCALONES VISIBLE -->
-    <div id="staircase-map" class="staircase-map" style="display: none;">
-        <div class="stair-step" id="step-ind-10"><span>Escalón 10: Ciencia (Crítico)</span><span>🏁</span></div>
-        <div class="stair-step" id="step-ind-9"><span>Escalón 9: Ciencia (Inferencial)</span><span>🪜</span></div>
-        <div class="stair-step" id="step-ind-8"><span>Escalón 8: Fábula (Inferencial)</span><span>🪜</span></div>
-        <div class="stair-step" id="step-ind-7"><span>Escalón 7: Fábula (Literal)</span><span>🪜</span></div>
-        <div class="stair-step" id="step-ind-6"><span>Escalón 6: Sociedad (Crítico)</span><span>🪜</span></div>
-        <div class="stair-step" id="step-ind-5"><span>Escalón 5: Sociedad (Inferencial)</span><span>🪜</span></div>
-        <div class="stair-step" id="step-ind-4"><span>Escalón 4: Historia (Crítico)</span><span>🪜</span></div>
-        <div class="stair-step" id="step-ind-3"><span>Escalón 3: Historia (Literal)</span><span>🪜</span></div>
-        <div class="stair-step" id="step-ind-2"><span>Escalón 2: Biología (Inferencial)</span><span>🪜</span></div>
-        <div class="stair-step active" id="step-ind-1"><span>Escalón 1: Biología (Literal)</span><span>📍</span></div>
+    <!-- Escenario 2D Retro -->
+    <div id="canvas-container" class="game-canvas-container" style="display: none;">
+        <canvas id="gameCanvas" width="760" height="200"></canvas>
     </div>
 
     <!-- PASO 0: REGISTRO -->
     <div id="step-0" class="step-box active">
         <div class="context-box" style="text-align: center;">
             <span style="font-size: 3rem;">🌴🎒</span><br><br>
-            ¡Bienvenido viajero! Ingresa tu nombre para comenzar tu ascenso en la escalera del conocimiento con orgullo guajiro.
+            ¡Bienvenido! Ingresa tu nombre completo para iniciar tu ascenso en la Escalera del Saber.
         </div>
-        <label for="student-name"><b>Nombre del Estudiante:</b></label>
+        <label for="student-name"><b>Nombre Completo del Estudiante:</b></label>
         <input type="text" id="student-name" required placeholder="Ej. Luis Mario Epieyu">
-        <button onclick="iniciarEvaluacion()">¡Subir al Primer Escalón! 🚀</button>
+        <button onclick="iniciarEvaluacion()">¡Iniciar Escalada! 🚀</button>
     </div>
 
     <!-- PREGUNTA 1 (LITERAL) -->
@@ -129,8 +270,8 @@
             <b>Texto 1: El ciclo de la vida (Biología)</b><br>
             Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente y comienzan a desarrollar pulmones. Finalmente, emergen a la tierra como ranas adultas, listas para explorar un mundo nuevo fuera del agua.
         </div>
-        <div class="question-card card-literal">
-            <span class="badge-nivel badge-literal">Nivel Literal - Peldaño 1</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Literal - Escalón 1</span>
             <div class="question-title">1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? *</div>
             <div class="options">
                 <label><input type="radio" name="q1" value="Comienzan a caminar sobre el agua"> Comienzan a caminar sobre el agua.</label>
@@ -139,7 +280,7 @@
                 <label><input type="radio" name="q1" value="Su dieta se vuelve exclusivamente acuática"> Su dieta se vuelve exclusivamente acuática.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(1)">Subir al Siguiente Peldaño ➔</button>
+        <button onclick="procesarRespuesta(1, 'literal')">Subir al Siguiente Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 2 (INFERENCIAL) -->
@@ -147,8 +288,8 @@
         <div class="context-box">
             <b>Texto 1: El ciclo de la vida (Biología)</b> (Continuación)
         </div>
-        <div class="question-card card-inferencial">
-            <span class="badge-nivel badge-inferencial">Nivel Inferencial - Peldaño 2</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Inferencial - Escalón 2</span>
             <div class="question-title">2. ¿Qué se puede deducir sobre el entorno de vida de las ranas? *</div>
             <div class="options">
                 <label><input type="radio" name="q2" value="Solo pueden vivir en entornos húmedos debido a su piel"> Solo pueden vivir en entornos húmedos debido a su piel.</label>
@@ -157,7 +298,7 @@
                 <label><input type="radio" name="q2" value="La metamorfosis ocurre solo en climas fríos"> La metamorfosis ocurre solo en climas fríos.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(2)">Subir al Siguiente Peldaño ➔</button>
+        <button onclick="procesarRespuesta(2, 'inferencial')">Subir al Siguiente Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 3 (LITERAL) -->
@@ -166,8 +307,8 @@
             <b>Texto 2: El Nilo y Egipto (Historia)</b><br>
             El Antiguo Egipto no habría sido la civilización esplendorosa que conocemos sin el río Nilo. Cada año, el río se desbordaba, cubriendo las tierras circundantes con un lodo fértil que permitía el cultivo de trigo y cebada. Los egipcios aprendieron a controlar estas crecidas mediante canales de riego, lo que les permitió tener excedentes de comida, tiempo para construir pirámides y desarrollar una sociedad compleja.
         </div>
-        <div class="question-card card-literal">
-            <span class="badge-nivel badge-literal">Nivel Literal - Peldaño 3</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Literal - Escalón 3</span>
             <div class="question-title">3. ¿Qué permitía el lodo dejado por el Nilo después de sus desbordamientos? *</div>
             <div class="options">
                 <label><input type="radio" name="q3" value="La construcción de las grandes pirámides de piedra"> La construcción de las grandes pirámides de piedra.</label>
@@ -176,7 +317,7 @@
                 <label><input type="radio" name="q3" value="La limpieza del agua para el consumo humano"> La limpieza del agua para el consumo humano.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(3)">Subir al Siguiente Peldaño ➔</button>
+        <button onclick="procesarRespuesta(3, 'literal')">Subir al Siguiente Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 4 (CRÍTICO) -->
@@ -184,8 +325,8 @@
         <div class="context-box">
             <b>Texto 2: El Nilo y Egipto (Historia)</b> (Continuación)
         </div>
-        <div class="question-card card-critico">
-            <span class="badge-nivel badge-critico">Nivel Crítico - Peldaño 4</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Crítico - Escalón 4</span>
             <div class="question-title">4. ¿Qué importancia tuvo la geografía en el desarrollo de la civilización egipcia? *</div>
             <div class="options">
                 <label><input type="radio" name="q4" value="Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar"> Fue irrelevante, ya que los egipcios habrían prosperado en cualquier lugar.</label>
@@ -194,7 +335,7 @@
                 <label><input type="radio" name="q4" value="Solo sirvió como defensa natural contra los enemigos extranjeros"> Solo sirvió como defensa natural contra los enemigos extranjeros.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(4)">Subir al Siguiente Peldaño ➔</button>
+        <button onclick="procesarRespuesta(4, 'critico')">Subir al Siguiente Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 5 (INFERENCIAL) -->
@@ -203,8 +344,8 @@
             <b>Texto 3: El uso de la tecnología (Sociedad)</b><br>
             El uso excesivo de dispositivos electrónicos antes de dormir se ha convertido en una preocupación de salud pública. La luz azul emitida por las pantallas engaña a nuestro cerebro haciéndole creer que aún es de día, lo que inhibe la producción de melatonina, la hormona encargada de inducir el sueño. Como resultado, muchos jóvenes reportan fatiga, falta de concentración en clases y mal humor durante el día.
         </div>
-        <div class="question-card card-inferencial">
-            <span class="badge-nivel badge-inferencial">Nivel Inferencial - Peldaño 5</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Inferencial - Escalón 5</span>
             <div class="question-title">5. ¿Qué relación existe entre la luz de las pantallas y el rendimiento escolar? *</div>
             <div class="options">
                 <label><input type="radio" name="q5" value="La luz azul mejora la memoria a largo plazo"> La luz azul mejora la memoria a largo plazo.</label>
@@ -213,7 +354,7 @@
                 <label><input type="radio" name="q5" value="El uso de dispositivos es necesario para estudiar mejor"> El uso de dispositivos es necesario para estudiar mejor.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(5)">Subir al Siguiente Peldaño ➔</button>
+        <button onclick="procesarRespuesta(5, 'inferencial')">Subir al Siguiente Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 6 (CRÍTICO) -->
@@ -221,8 +362,8 @@
         <div class="context-box">
             <b>Texto 3: El uso de la tecnología (Sociedad)</b> (Continuación)
         </div>
-        <div class="question-card card-critico">
-            <span class="badge-nivel badge-critico">Nivel Crítico - Peldaño 6</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Crítico - Escalón 6</span>
             <div class="question-title">6. ¿Qué postura sugiere el autor sobre el uso de tecnología antes de dormir? *</div>
             <div class="options">
                 <label><input type="radio" name="q6" value="Promueve el uso de dispositivos como una forma de relajación"> Promueve el uso de dispositivos como una forma de relajación.</label>
@@ -231,7 +372,7 @@
                 <label><input type="radio" name="q6" value="Sugiere que la melatonina no es importante para los jóvenes"> Sugiere que la melatonina no es importante para los jóvenes.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(6)">Subir al Siguiente Peldaño ➔</button>
+        <button onclick="procesarRespuesta(6, 'critico')">Subir al Siguiente Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 7 (LITERAL) -->
@@ -240,8 +381,8 @@
             <b>Texto 4: La semilla ambiciosa (Fábula)</b><br>
             Una pequeña semilla cayó en tierra seca y dura. A su alrededor, las otras semillas se quejaban de la falta de agua, pero esta semilla decidió abrirse camino buscando las profundidades de la tierra, donde sabía que encontraría humedad. Años después, mientras las otras semillas habían desaparecido, aquella pequeña semilla se había convertido en un robusto árbol cuyas raíces profundas sostenían todo el jardín.
         </div>
-        <div class="question-card card-literal">
-            <span class="badge-nivel badge-literal">Nivel Literal - Peldaño 7</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Literal - Escalón 7</span>
             <div class="question-title">7. ¿Qué hizo la pequeña semilla ante la adversidad de la tierra seca? *</div>
             <div class="options">
                 <label><input type="radio" name="q7" value="Se quedó quieta esperando que lloviera"> Se quedó quieta esperando que lloviera.</label>
@@ -250,7 +391,7 @@
                 <label><input type="radio" name="q7" value="Se dejó llevar por el viento hacia otro lugar"> Se dejó llevar por el viento hacia otro lugar.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(7)">Subir al Siguiente Peldaño ➔</button>
+        <button onclick="procesarRespuesta(7, 'literal')">Subir al Siguiente Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 8 (INFERENCIAL) -->
@@ -258,8 +399,8 @@
         <div class="context-box">
             <b>Texto 4: La semilla ambiciosa (Fábula)</b> (Continuación)
         </div>
-        <div class="question-card card-inferencial">
-            <span class="badge-nivel badge-inferencial">Nivel Inferencial - Peldaño 8</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Inferencial - Escalón 8</span>
             <div class="question-title">8. ¿Qué representa la acción de la semilla en esta historia? *</div>
             <div class="options">
                 <label><input type="radio" name="q8" value="La importancia de la suerte en la vida"> La importancia de la suerte en la vida.</label>
@@ -268,7 +409,7 @@
                 <label><input type="radio" name="q8" value="Que es mejor vivir en lugares cómodos que en lugares difíciles"> Que es mejor vivir en lugares cómodos que en lugares difíciles.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(8)">Subir al Siguiente Peldaño ➔</button>
+        <button onclick="procesarRespuesta(8, 'inferencial')">Subir al Siguiente Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 9 (INFERENCIAL) -->
@@ -277,8 +418,8 @@
             <b>Exploración espacial (Ciencia)</b><br>
             La exploración de Marte ha sido un sueño de la humanidad durante décadas. Los científicos argumentan que estudiar el planeta rojo podría revelar si alguna vez hubo vida allí o si, en el futuro, los humanos podrían habitarlo. Sin embargo, este proceso es extremadamente costoso y requiere una cooperación internacional sin precedentes, lo que genera debates sobre si ese dinero debería invertirse primero en solucionar problemas de la Tierra.
         </div>
-        <div class="question-card card-inferencial">
-            <span class="badge-nivel badge-inferencial">Nivel Inferencial - Peldaño 9</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Inferencial - Escalón 9</span>
             <div class="question-title">9. ¿Por qué la exploración de Marte es un tema de debate? *</div>
             <div class="options">
                 <label><input type="radio" name="q9" value="Porque no hay evidencia de que Marte sea un planeta interesante"> Porque no hay evidencia de que Marte sea un planeta interesante.</label>
@@ -287,7 +428,7 @@
                 <label><input type="radio" name="q9" value="Porque el costo es bajo pero los riesgos son muy altos"> Porque el costo es bajo pero los riesgos son muy altos.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(9)">Subir al Último Peldaño ➔</button>
+        <button onclick="procesarRespuesta(9, 'inferencial')">Subir al Último Escalón ➔</button>
     </div>
 
     <!-- PREGUNTA 10 (CRÍTICO) -->
@@ -295,8 +436,8 @@
         <div class="context-box">
             <b>Exploración espacial (Ciencia)</b> (Continuación)
         </div>
-        <div class="question-card card-critico">
-            <span class="badge-nivel badge-critico">Nivel Crítico - Peldaño 10</span>
+        <div class="question-card">
+            <span class="badge-nivel">Nivel Crítico - Escalón 10</span>
             <div class="question-title">10. ¿Cuál es el dilema principal que plantea el texto? *</div>
             <div class="options">
                 <label><input type="radio" name="q10" value="La tecnología actual es incapaz de llegar a Marte"> La tecnología actual es incapaz de llegar a Marte.</label>
@@ -305,20 +446,20 @@
                 <label><input type="radio" name="q10" value="La falta de interés de la población en la exploración espacial"> La falta de interés de la población en la exploración espacial.</label>
             </div>
         </div>
-        <button onclick="procesarRespuesta(10)">¡Llegar a la Cima y Enviar Reporte! 🏆</button>
+        <button onclick="procesarRespuesta(10, 'critico')">¡Alcanzar la Cima! 🏆</button>
     </div>
 
     <!-- PANTALLA DE RESULTADOS -->
     <div id="step-success" class="step-box" style="text-align: center;">
-        <h2 style="color: #38bdf8;">¡Cima de la Escalera Alcanzada!</h2>
-        <p id="score-text" style="font-size: 1.25rem; font-weight: 600; margin: 20px 0;"></p>
-        <h3>Insignias y Estrellas Obtenidas:</h3>
+        <h2 style="color: #38bdf8; font-size: 1.8rem; margin-bottom: 10px;">¡Felicidades! Has llegado a la cima</h2>
+        <p id="score-text" style="font-size: 1.25rem; font-weight: 700; margin: 20px 0; color: #f8fafc;"></p>
+        <h3 style="color: #94a3b8;">Insignias Obtenidas:</h3>
         <div class="badge-container" id="badges-list"></div>
-        <p style="margin-top: 30px; color: #34d399; font-weight: 600;" id="status-envio">Enviando resultados al sistema institucional...</p>
+        <p style="margin-top: 30px; color: #34d399; font-weight: 700;" id="status-envio">Enviando resultados al docente...</p>
     </div>
 </div>
 
-<!-- VENTANA ANIMADA GRANDE (FEEDBACK OVERLAY) -->
+<!-- MODAL DE FEEDBACK -->
 <div id="feedback-overlay" class="feedback-overlay">
     <div class="feedback-content">
         <div id="fb-emoji" class="feedback-emoji">😃</div>
@@ -331,6 +472,12 @@
 let studentName = "";
 let resultadosEstudiante = {};
 let puntajeTotal = 0;
+let escalonActual = 1;
+
+// Motor Gráfico Canvas
+let canvas, ctx;
+let playerX = 50;
+let playerY = 160;
 
 function iniciarEvaluacion() {
     studentName = document.getElementById('student-name').value.trim();
@@ -339,45 +486,46 @@ function iniciarEvaluacion() {
         return;
     }
     document.getElementById('hud-name').innerText = studentName;
-    document.getElementById('hud-section').style.display = 'flex';
-    document.getElementById('staircase-map').style.display = 'flex';
+    document.getElementById('hud-bar').style.display = 'flex';
+    document.getElementById('canvas-container').style.display = 'block';
+    
+    canvas = document.getElementById('gameCanvas');
+    ctx = canvas.getContext('2d');
+    
+    aplicarTemaNivel('literal');
     cambiarPaso(1);
+    dibujarEscenario();
+}
+
+function aplicarTemaNivel(nivel) {
+    const root = document.documentElement;
+    if(nivel === 'literal') {
+        root.style.setProperty('--current-theme', 'var(--literal-color)');
+        root.style.setProperty('--current-bg', 'var(--literal-bg)');
+        root.style.setProperty('--current-border', 'var(--literal-border)');
+    } else if(nivel === 'inferencial') {
+        root.style.setProperty('--current-theme', 'var(--inferencial-color)');
+        root.style.setProperty('--current-bg', 'var(--inferencial-bg)');
+        root.style.setProperty('--current-border', 'var(--inferencial-border)');
+    } else if(nivel === 'critico') {
+        root.style.setProperty('--current-theme', 'var(--critico-color)');
+        root.style.setProperty('--current-bg', 'var(--critico-bg)');
+        root.style.setProperty('--current-border', 'var(--critico-border)');
+    }
 }
 
 function cambiarPaso(paso) {
     document.querySelectorAll('.step-box').forEach(el => el.classList.remove('active'));
     if(paso !== 'success') {
         document.getElementById(`step-${paso}`).classList.add('active');
-        actualizarMapaEscalera(paso);
     } else {
         document.getElementById('step-success').classList.add('active');
-        document.getElementById('staircase-map').style.display = 'none';
+        document.getElementById('canvas-container').style.display = 'none';
     }
-    document.getElementById('progress').style.width = (paso === 'success' ? 100 : ((paso - 1) / 10) * 100) + '%';
     window.scrollTo(0, 0);
 }
 
-function actualizarMapaEscalera(peldañoActual) {
-    for(let i = 1; i <= 10; i++) {
-        const stepEl = document.getElementById(`step-ind-${i}`);
-        if(i < peldañoActual) {
-            stepEl.className = "stair-step completed";
-            stepEl.innerHTML = `<span>Escalón ${i}</span><span>✔️</span>`;
-        } else if(i === peldañoActual) {
-            stepEl.className = "stair-step active";
-            stepEl.innerHTML = `<span>Escalón ${i} (En curso)</span><span>📍🎒</span>`;
-        } else {
-            stepEl.className = "stair-step";
-            stepEl.innerHTML = `<span>Escalón ${i}</span><span>🪜</span>`;
-        }
-    }
-    
-    let estrellas = "⭐".repeat(Math.floor(puntajeTotal / 30) + 1);
-    document.getElementById('hud-stars').innerText = estrellas;
-    document.getElementById('hud-score').innerText = `Puntaje: ${puntajeTotal} pts | Escalón ${peldañoActual}/10`;
-}
-
-function procesarRespuesta(numQ) {
+function procesarRespuesta(numQ, nivelCognitivo) {
     const seleccionada = document.querySelector(`input[name="q${numQ}"]:checked`);
     
     if(!seleccionada) {
@@ -386,7 +534,11 @@ function procesarRespuesta(numQ) {
     }
 
     const esCorrecta = seleccionada.getAttribute('data-correct') === 'true';
-    resultadosEstudiante[`q${numQ}`] = esCorrecta ? "✔️ Correcta" : "❌ Incorrecta";
+    
+    // Guardar si es el primer intento
+    if(!resultadosEstudiante[`q${numQ}`]) {
+        resultadosEstudiante[`q${numQ}`] = esCorrecta ? "✔️ Correcta" : "❌ Incorrecta";
+    }
 
     const overlay = document.getElementById('feedback-overlay');
     const emoji = document.getElementById('fb-emoji');
@@ -394,32 +546,86 @@ function procesarRespuesta(numQ) {
     const sub = document.getElementById('fb-sub');
 
     if(esCorrecta) {
+        // Sumar exactamente 10 puntos por acierto
         puntajeTotal += 10;
+        escalonActual++;
+        playerX += 65; // Avanzar en el escenario 2D
+
+        document.getElementById('hud-score').innerText = `${puntajeTotal} / 100 pts`;
+        
+        let cuantasEstrellas = Math.floor(puntajeTotal / 30) + 1;
+        document.getElementById('hud-stars').innerText = "⭐".repeat(cuantasEstrellas);
+
         emoji.innerText = "🎉";
-        title.innerText = "¡Peldaño Superado!";
-        sub.innerText = "Respuesta Correcta (+10 Puntos)";
+        title.innerText = "¡Respuesta Correcta!";
+        sub.innerText = "+10 Puntos | ¡Subes de escalón!";
         overlay.style.display = "flex";
         
-        confetti({
-            particleCount: 120,
-            spread: 80,
-            origin: { y: 0.6 }
-        });
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+        dibujarEscenario();
+
+        setTimeout(() => {
+            overlay.style.display = "none";
+            if(numQ === 10) {
+                finalizarEvaluacion();
+            } else {
+                // Definir color del siguiente nivel
+                let siguienteNivel = 'literal';
+                if([2, 5, 8, 9].includes(numQ + 1)) siguienteNivel = 'inferencial';
+                if([4, 6, 10].includes(numQ + 1)) siguienteNivel = 'critico';
+                
+                aplicarTemaNivel(siguienteNivel);
+                cambiarPaso(numQ + 1);
+            }
+        }, 1600);
+
     } else {
+        // Si falla, NO avanza de escalón
         emoji.innerText = "🤔";
-        title.innerText = "¡Ánimo en el Ascenso!";
-        sub.innerText = "Respuesta incorrecta. ¡Sigue subiendo!";
+        title.innerText = "¡Inténtalo de Nuevo!";
+        sub.innerText = "Revisa bien la lectura y selecciona otra opción.";
         overlay.style.display = "flex";
+
+        setTimeout(() => {
+            overlay.style.display = "none";
+        }, 1600);
+    }
+}
+
+function dibujarEscenario() {
+    if(!ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Fondo arcade retro
+    ctx.fillStyle = "#020617";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Dibujar 10 Escalones/Plataformas
+    for(let i = 0; i < 10; i++) {
+        let x = 30 + (i * 68);
+        let y = 170 - (i * 12);
+
+        // Viga
+        ctx.fillStyle = (i < escalonActual) ? "#10b981" : "#334155";
+        ctx.fillRect(x, y, 60, 10);
+
+        // Escalera conectora
+        if(i < 9) {
+            ctx.fillStyle = "#f59e0b";
+            ctx.fillRect(x + 45, y - 12, 6, 12);
+        }
     }
 
-    setTimeout(() => {
-        overlay.style.display = "none";
-        if(numQ === 10) {
-            finalizarEvaluacion();
-        } else {
-            cambiarPaso(numQ + 1);
-        }
-    }, 1800);
+    // Dibujar Avatar (Estudiante)
+    ctx.fillStyle = "#ef4444"; // Manta/Camiseta
+    ctx.fillRect(playerX, playerY - (escalonActual * 12), 18, 22);
+
+    ctx.fillStyle = "#fde047"; // Sombrero
+    ctx.fillRect(playerX - 2, playerY - (escalonActual * 12) - 8, 22, 6);
+
+    ctx.fillStyle = "#38bdf8"; // Mochila
+    ctx.fillRect(playerX - 6, playerY - (escalonActual * 12) + 4, 6, 12);
 }
 
 function finalizarEvaluacion() {
@@ -436,7 +642,7 @@ function finalizarEvaluacion() {
     badges.forEach(b => { badgeHtml += `<div class="badge">🏆 ${b}</div>`; });
     document.getElementById('badges-list').innerHTML = badgeHtml;
 
-    // URL oficial de tu Google Apps Script integrada
+    // Enlace a tu Google Apps Script
     const urlScript = "https://script.google.com/macros/s/AKfycbysnce9zUyECNKb0GaOI2ZTM54FDisg-0ZZq1o84aEYQPyrmjSUClZTt802JjoAyXovBA/exec"; 
     
     const datosEnvio = {
@@ -461,9 +667,9 @@ function finalizarEvaluacion() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(datosEnvio)
     }).then(() => {
-        document.getElementById('status-envio').innerText = "✅ ¡Ascenso registrado con éxito en la base de datos!";
+        document.getElementById('status-envio').innerText = "✅ ¡Resultados almacenados con éxito en la hoja de cálculo!";
     }).catch(() => {
-        document.getElementById('status-envio').innerText = "⚠️ Evaluación completada, error de enlace con el servidor de reportes.";
+        document.getElementById('status-envio').innerText = "⚠️ Evaluación finalizada localmente.";
     });
 }
 </script>
