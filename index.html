@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Escalera del Saber - Aventura Épica</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kalam:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(ellipse at 50% 0%, #102a5c 0%, #07142e 55%, #030916 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+      padding: 14px 10px 28px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .main-title {
+      font-size: clamp(1.7rem, 4vw, 2.3rem);
+      font-weight: 800;
+      background: linear-gradient(90deg, #fde047, #38bdf8, #fde047);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.4));
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: clamp(0.82rem, 2vw, 0.94rem);
+      color: #bae6fd;
+      text-align: center;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    /* BARRA SUPERIOR */
+    .top-bar {
+      width: 100%;
+      background: linear-gradient(180deg, rgba(15, 29, 58, 0.92), rgba(9, 18, 38, 0.95));
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 0.96rem;
+      color: #f8fafc;
+    }
+
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #fbbf24;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .score-badge.bump {
+      transform: scale(1.28);
+      color: #fef08a;
+      text-shadow: 0 0 18px rgba(250, 204, 21, 0.95);
+    }
+
+    .floating-points {
+      position: absolute;
+      right: 16px;
+      top: -12px;
+      background: linear-gradient(135deg, #22c55e, #15803d);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 5px 13px;
+      border-radius: 999px;
+      border: 1.5px solid #bbf7d0;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.85);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 60;
+    }
+
+    .floating-points.show {
+      animation: floatUpPts 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes floatUpPts {
+      0% { opacity: 0; transform: translateY(16px) scale(0.7); }
+      25% { opacity: 1; transform: translateY(-6px) scale(1.12); }
+      75% { opacity: 1; transform: translateY(-22px) scale(1); }
+      100% { opacity: 0; transform: translateY(-38px) scale(0.9); }
+    }
+
+    /* ESCENARIO FANTASÍA 3D */
+    .stage-wrapper {
+      position: relative;
+      width: 100%;
+      height: 650px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+      margin-bottom: 12px;
+    }
+
+    #fantasy-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* TARJETA DE PREGUNTA ESTILO MÁGICO DORADO/AZUL */
+    .holo-quiz-card {
+      position: absolute;
+      right: 12px;
+      bottom: 14px;
+      width: 55%;
+      min-width: 300px;
+      max-width: 380px;
+      background: linear-gradient(165deg, rgba(12, 25, 52, 0.86) 0%, rgba(7, 15, 34, 0.94) 100%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 16px;
+      padding: 16px 15px;
+      border: 1.5px solid rgba(251, 191, 36, 0.65);
+      box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.65),
+        0 0 22px rgba(251, 191, 36, 0.25),
+        inset 0 0 15px rgba(56, 189, 248, 0.15);
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .holo-quiz-card.card-correct {
+      border-color: #4ade80;
+      box-shadow: 0 0 35px rgba(34, 197, 94, 0.6), inset 0 0 20px rgba(34, 197, 94, 0.22);
+    }
+
+    .holo-quiz-card.card-wrong {
+      border-color: #f87171;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+      animation: shakeCard 0.42s ease;
+    }
+
+    @keyframes shakeCard {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-7px); }
+      40% { transform: translateX(7px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+
+    .level-pill {
+      display: inline-block;
+      background: linear-gradient(90deg, #d97706, #f59e0b);
+      color: #fffbeb;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 4px 11px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+    }
+
+    .question-title {
+      font-size: 0.93rem;
+      font-weight: 700;
+      line-height: 1.36;
+      color: #ffffff;
+      margin-bottom: 11px;
+    }
+
+    .question-title .req {
+      color: #fbbf24;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .option-item {
+      width: 100%;
+      background: rgba(19, 34, 64, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 10px;
+      padding: 9px 11px;
+      color: #f1f5f9;
+      font-size: 0.8rem;
+      font-weight: 500;
+      line-height: 1.3;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-item:hover:not(:disabled) {
+      border-color: #fde047;
+      background: rgba(30, 54, 96, 0.9);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.25);
+    }
+
+    .option-item.selected {
+      border-color: #38bdf8;
+      background: rgba(14, 116, 144, 0.45);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+      color: #ffffff;
+    }
+
+    .option-item.correct-anim {
+      border-color: #4ade80 !important;
+      background: linear-gradient(90deg, rgba(22, 163, 74, 0.65), rgba(21, 128, 61, 0.45)) !important;
+      box-shadow: 0 0 22px rgba(34, 197, 94, 0.7) !important;
+      color: #ffffff !important;
+      transform: scale(1.02);
+    }
+
+    .option-item.wrong-anim {
+      border-color: #f87171 !important;
+      background: linear-gradient(90deg, rgba(220, 38, 38, 0.55), rgba(153, 27, 27, 0.4)) !important;
+      color: #fecaca !important;
+    }
+
+    .radio-circle {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1.5px solid #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .option-item.selected .radio-circle {
+      border-color: #38bdf8;
+      box-shadow: 0 0 6px #38bdf8;
+    }
+
+    .radio-inner {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #38bdf8;
+      transform: scale(0);
+      transition: transform 0.2s ease;
+    }
+
+    .option-item.selected .radio-inner {
+      transform: scale(1);
+    }
+
+    .feedback-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 11px;
+      border-radius: 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .feedback-banner.ok {
+      display: flex;
+      background: rgba(22, 163, 74, 0.35);
+      border: 1px solid #4ade80;
+      color: #bbf7d0;
+    }
+
+    .feedback-banner.fail {
+      display: flex;
+      background: rgba(220, 38, 38, 0.32);
+      border: 1px solid #f87171;
+      color: #fecaca;
+    }
+
+    .next-step-btn {
+      width: 100%;
+      background: linear-gradient(90deg, #0284c7 0%, #2563eb 50%, #1d4ed8 100%);
+      border: 1px solid #7dd3fc;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.86rem;
+      padding: 11px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.55);
+      transition: all 0.2s ease;
+    }
+
+    .next-step-btn:hover:not(:disabled) {
+      filter: brightness(1.14);
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.85);
+    }
+
+    .error-msg {
+      color: #fda4af;
+      font-size: 0.74rem;
+      margin-bottom: 7px;
+      display: none;
+      font-weight: 600;
+    }
+
+    /* BARRAS INFERIORES DE LECTURA */
+    .reading-bars-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .reading-bar {
+      width: 100%;
+      background: rgba(11, 22, 44, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-left: 4px solid #fbbf24;
+      border-radius: 12px;
+      padding: 13px 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      cursor: pointer;
+    }
+
+    .reading-bar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      color: #e2e8f0;
+    }
+
+    .reading-content {
+      margin-top: 9px;
+      padding-top: 9px;
+      border-top: 1px solid rgba(71, 85, 105, 0.45);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+    }
+
+    /* MODALES */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 20, 0.88);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 430px;
+      background: linear-gradient(160deg, rgba(16, 32, 62, 0.96), rgba(8, 17, 36, 0.98));
+      border: 1.5px solid rgba(251, 191, 36, 0.65);
+      box-shadow: 0 0 40px rgba(251, 191, 36, 0.25);
+      border-radius: 18px;
+      padding: 26px 22px;
+      text-align: center;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      background: rgba(7, 14, 29, 0.92);
+      color: #fff;
+      font-size: 0.95rem;
+      margin: 12px 0 16px;
+      outline: none;
+    }
+
+    @media (max-width: 620px) {
+      .stage-wrapper {
+        height: 700px;
+      }
+      .holo-quiz-card {
+        width: 94%;
+        right: 3%;
+        bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+    <h1 class="main-title">La Escalera del Saber</h1>
+    <p class="subtitle">El conocimiento te lleva más lejos · Ruta de Comprensión Lectora</p>
+
+    <div class="top-bar">
+      <div class="user-badge">
+        <span>🎒</span>
+        <span id="student-label">Explorador</span>
+      </div>
+      <div class="score-badge" id="score-badge">
+        <span>⭐</span>
+        <span id="score-label">0 / 100 pts</span>
+      </div>
+      <div class="floating-points" id="floating-points">+10 pts ⭐</div>
+    </div>
+
+    <div class="stage-wrapper">
+      <canvas id="fantasy-canvas"></canvas>
+
+      <div class="holo-quiz-card" id="quiz-card">
+        <div class="level-pill" id="level-pill">NIVEL LITERAL - ESCALÓN 1</div>
+        <div class="question-title" id="question-title">
+          1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas? <span class="req">*</span>
+        </div>
+
+        <div class="options-list" id="options-list"></div>
+
+        <div class="feedback-banner" id="feedback-banner">
+          <span id="feedback-text">¡Respuesta Correcta!</span>
+          <span id="feedback-pts">+10 PTS</span>
+        </div>
+
+        <div class="error-msg" id="error-msg">Selecciona una opción para subir de escalón.</div>
+
+        <button class="next-step-btn" id="next-btn">
+          <span>Subir al Siguiente Escalón</span>
+          <span>➔</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="reading-bars-container">
+      <div class="reading-bar" onclick="toggleReadingBody()">
+        <div class="reading-bar-header">
+          <div>
+            <strong id="reading-bar-title-1">Texto 1: El ciclo de la vida (Biología)</strong>
+            <span style="color:#94a3b8; font-size:0.8rem;" id="reading-bar-sub-1"> (Toque para ocultar/mostrar lectura)</span>
+          </div>
+          <span style="color:#fbbf24; font-size:0.8rem; font-weight:700;">📜 Lectura</span>
+        </div>
+        <div class="reading-content" id="reading-text-content"></div>
+      </div>
+
+      <div class="reading-bar" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <div class="reading-bar-header">
+          <div>
+            <strong id="reading-bar-title-2">Texto 1: El ciclo de la vida (Biología)</strong>
+            <span style="color:#94a3b8; font-size:0.8rem;" id="reading-bar-sub-2">(Continuación)</span>
+          </div>
+          <span style="color:#7dd3fc; font-size:0.8rem; font-weight:600;" id="progress-footer">Peldaño 1 de 10</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL INICIAL -->
+  <div class="modal-backdrop" id="start-modal">
+    <div class="modal-box">
+      <div style="font-size:2.5rem; margin-bottom:6px;">🧭</div>
+      <h2 style="font-size:1.4rem; font-weight:800; color:#fde047; margin-bottom:6px;">
+        El Conocimiento te lleva más lejos
+      </h2>
+      <p style="font-size:0.86rem; color:#cbd5e1; line-height:1.45;">
+        Prueba Final de Comprensión Lectora. Ingresa tu nombre completo para iniciar el ascenso hacia el Castillo del Saber.
+      </p>
+      <input
+        type="text"
+        id="student-name-input"
+        class="modal-input"
+        placeholder="Escribe tu nombre completo..."
+      />
+      <p id="name-error" style="color:#fda4af; font-size:0.78rem; margin-bottom:10px; display:none;">
+        Por favor ingresa tu nombre para comenzar.
+      </p>
+      <button class="next-step-btn" id="start-game-btn">
+        Comenzar Aventura ➔
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL FINAL -->
+  <div class="modal-backdrop" id="end-modal" style="display:none;">
+    <div class="modal-box">
+      <div style="font-size:2.9rem; margin-bottom:6px;">🏰✨</div>
+      <h2 style="font-size:1.45rem; font-weight:800; color:#fde047; margin-bottom:6px;">
+        ¡Llegaste al Castillo del Saber!
+      </h2>
+      <p id="end-student-name" style="font-size:0.95rem; color:#7dd3fc; font-weight:600; margin-bottom:14px;"></p>
+      <div style="background:rgba(7,14,29,0.92); border:1px solid rgba(251,191,36,0.45); border-radius:12px; padding:14px; margin-bottom:14px;">
+        <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase;">Puntaje Final</div>
+        <div id="end-score" style="font-size:2.1rem; font-weight:800; color:#fbbf24; margin-top:4px;">0 / 100 pts</div>
+      </div>
+      <p id="sheet-status" style="font-size:0.82rem; color:#cbd5e1; margin-bottom:16px;">
+        Enviando tus respuestas a Google Sheets...
+      </p>
+      <button class="next-step-btn" onclick="location.reload()">
+        Jugar de Nuevo ↻
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // URL DE GOOGLE SHEETS DEL NUEVO DOCUMENTO
+    // =========================================================================
+    const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbxonkdtLDac-XGzGodfDn_QwkvckM90hjbBjie4G53jUvEwdh1wFp8FLjmank-lBIkgIA/exec";
+
+    // =========================================================================
+    // SONIDOS Y CONFETIS
+    // =========================================================================
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playSound(type) {
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        if (type === "correct") {
+          [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(freq, now + i * 0.07);
+            gain.gain.setValueAtTime(0.18, now + i * 0.07);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.28);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.07);
+            osc.stop(now + i * 0.07 + 0.28);
+          });
+        } else {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(210, now);
+          osc.frequency.linearRampToValueAtTime(135, now + 0.3);
+          gain.gain.setValueAtTime(0.13, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.34);
+        }
+      } catch (e) {}
+    }
+
+    function launchSuccessConfetti() {
+      if (typeof confetti !== "function") return;
+      confetti({
+        particleCount: 80,
+        spread: 72,
+        origin: { x: 0.62, y: 0.62 },
+        colors: ["#fde047", "#38bdf8", "#4ade80", "#f59e0b", "#ffffff"]
+      });
+    }
+
+    function launchVictoryConfetti() {
+      if (typeof confetti !== "function") return;
+      const end = Date.now() + 3000;
+      (function frame() {
+        confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }, colors: ["#fde047", "#38bdf8", "#4ade80"] });
+        confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }, colors: ["#fde047", "#38bdf8", "#4ade80"] });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+    }
+
+    // =========================================================================
+    // LAS 10 PREGUNTAS EXACTAS EN EL ORDEN DEL PDF
+    // =========================================================================
+    const QUESTIONS = [
+      {
+        step: 1,
+        title: "Texto 1: El ciclo de la vida (Biología)",
+        sub: "(Parte 1)",
+        text: "Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente y comienzan a desarrollar pulmones. Finalmente, emergen a la tierra como ranas adultas, listas para explorar un mundo nuevo fuera del agua.",
+        badge: "NIVEL LITERAL - ESCALÓN 1",
+        question: "1. ¿Qué característica de los renacuajos cambia al convertirse en ranas adultas?",
+        options: [
+          "Comienzan a caminar sobre el agua.",
+          "Sus pulmones desaparecen.",
+          "El método de respiración y su anatomía física.",
+          "Su dieta se vuelve exclusivamente acuática."
+        ],
+        correct: 2
+      },
+      {
+        step: 2,
+        title: "Texto 1: El ciclo de la vida (Biología)",
+        sub: "(Continuación)",
+        text: "Las ranas pasan por un proceso asombroso llamado metamorfosis. Al nacer, son renacuajos que viven bajo el agua y respiran a través de branquias, similar a los peces. Con el paso de las semanas, su cuerpo cambia: les crecen patas traseras y delanteras, su cola desaparece gradualmente
