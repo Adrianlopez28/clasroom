@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Escalera del Saber - Post-test de Comprensión Lectora</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Kalam:wght@700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(ellipse at 50% 0%, #102a5c 0%, #07142e 55%, #030916 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      overflow-x: hidden;
+      padding: 14px 10px 28px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .main-title {
+      font-size: clamp(1.7rem, 4vw, 2.3rem);
+      font-weight: 800;
+      background: linear-gradient(90deg, #fde047, #38bdf8, #fde047);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      filter: drop-shadow(0 2px 12px rgba(56, 189, 248, 0.4));
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: clamp(0.82rem, 2vw, 0.94rem);
+      color: #bae6fd;
+      text-align: center;
+      margin-bottom: 12px;
+      font-weight: 500;
+    }
+
+    /* BARRA SUPERIOR */
+    .top-bar {
+      width: 100%;
+      background: linear-gradient(180deg, rgba(15, 29, 58, 0.92), rgba(9, 18, 38, 0.95));
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 10px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .user-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 0.96rem;
+      color: #f8fafc;
+    }
+
+    .score-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 1rem;
+      color: #fbbf24;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .score-badge.bump {
+      transform: scale(1.28);
+      color: #fef08a;
+      text-shadow: 0 0 18px rgba(250, 204, 21, 0.95);
+    }
+
+    .floating-points {
+      position: absolute;
+      right: 16px;
+      top: -12px;
+      background: linear-gradient(135deg, #22c55e, #15803d);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.9rem;
+      padding: 5px 13px;
+      border-radius: 999px;
+      border: 1.5px solid #bbf7d0;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.85);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 60;
+    }
+
+    .floating-points.show {
+      animation: floatUpPts 1.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    @keyframes floatUpPts {
+      0% { opacity: 0; transform: translateY(16px) scale(0.7); }
+      25% { opacity: 1; transform: translateY(-6px) scale(1.12); }
+      75% { opacity: 1; transform: translateY(-22px) scale(1); }
+      100% { opacity: 0; transform: translateY(-38px) scale(0.9); }
+    }
+
+    /* ESCENARIO FANTASÍA 3D */
+    .stage-wrapper {
+      position: relative;
+      width: 100%;
+      height: 650px;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1.5px solid rgba(56, 189, 248, 0.35);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+      margin-bottom: 12px;
+    }
+
+    #fantasy-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* TARJETA DE PREGUNTA ESTILO MÁGICO DORADO/AZUL */
+    .holo-quiz-card {
+      position: absolute;
+      right: 12px;
+      bottom: 14px;
+      width: 55%;
+      min-width: 300px;
+      max-width: 380px;
+      background: linear-gradient(165deg, rgba(12, 25, 52, 0.86) 0%, rgba(7, 15, 34, 0.94) 100%);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 16px;
+      padding: 16px 15px;
+      border: 1.5px solid rgba(251, 191, 36, 0.65);
+      box-shadow:
+        0 12px 32px rgba(0, 0, 0, 0.65),
+        0 0 22px rgba(251, 191, 36, 0.25),
+        inset 0 0 15px rgba(56, 189, 248, 0.15);
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .holo-quiz-card.card-correct {
+      border-color: #4ade80;
+      box-shadow: 0 0 35px rgba(34, 197, 94, 0.6), inset 0 0 20px rgba(34, 197, 94, 0.22);
+    }
+
+    .holo-quiz-card.card-wrong {
+      border-color: #f87171;
+      box-shadow: 0 0 30px rgba(239, 68, 68, 0.5);
+      animation: shakeCard 0.42s ease;
+    }
+
+    @keyframes shakeCard {
+      0%, 100% { transform: translateX(0); }
+      20% { transform: translateX(-7px); }
+      40% { transform: translateX(7px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+
+    .level-pill {
+      display: inline-block;
+      background: linear-gradient(90deg, #d97706, #f59e0b);
+      color: #fffbeb;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      padding: 4px 11px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+    }
+
+    .question-title {
+      font-size: 0.91rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: #ffffff;
+      margin-bottom: 11px;
+    }
+
+    .question-title .req {
+      color: #fbbf24;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .option-item {
+      width: 100%;
+      background: rgba(19, 34, 64, 0.78);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      border-radius: 10px;
+      padding: 9px 11px;
+      color: #f1f5f9;
+      font-size: 0.8rem;
+      font-weight: 500;
+      line-height: 1.3;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .option-item:hover:not(:disabled) {
+      border-color: #fde047;
+      background: rgba(30, 54, 96, 0.9);
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.25);
+    }
+
+    .option-item.selected {
+      border-color: #38bdf8;
+      background: rgba(14, 116, 144, 0.45);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+      color: #ffffff;
+    }
+
+    .option-item.correct-anim {
+      border-color: #4ade80 !important;
+      background: linear-gradient(90deg, rgba(22, 163, 74, 0.65), rgba(21, 128, 61, 0.45)) !important;
+      box-shadow: 0 0 22px rgba(34, 197, 94, 0.7) !important;
+      color: #ffffff !important;
+      transform: scale(1.02);
+    }
+
+    .option-item.wrong-anim {
+      border-color: #f87171 !important;
+      background: linear-gradient(90deg, rgba(220, 38, 38, 0.55), rgba(153, 27, 27, 0.4)) !important;
+      color: #fecaca !important;
+    }
+
+    .open-textarea {
+      width: 100%;
+      min-height: 92px;
+      background: rgba(15, 28, 54, 0.9);
+      border: 1.5px solid rgba(56, 189, 248, 0.5);
+      border-radius: 10px;
+      padding: 10px 12px;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      line-height: 1.4;
+      resize: none;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    .open-textarea:focus {
+      border-color: #fde047;
+      box-shadow: 0 0 12px rgba(251, 191, 36, 0.35);
+    }
+
+    .radio-circle {
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      border: 1.5px solid #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .option-item.selected .radio-circle {
+      border-color: #38bdf8;
+      box-shadow: 0 0 6px #38bdf8;
+    }
+
+    .radio-inner {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #38bdf8;
+      transform: scale(0);
+      transition: transform 0.2s ease;
+    }
+
+    .option-item.selected .radio-inner {
+      transform: scale(1);
+    }
+
+    .feedback-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 11px;
+      border-radius: 9px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .feedback-banner.ok {
+      display: flex;
+      background: rgba(22, 163, 74, 0.35);
+      border: 1px solid #4ade80;
+      color: #bbf7d0;
+    }
+
+    .feedback-banner.fail {
+      display: flex;
+      background: rgba(220, 38, 38, 0.32);
+      border: 1px solid #f87171;
+      color: #fecaca;
+    }
+
+    .next-step-btn {
+      width: 100%;
+      background: linear-gradient(90deg, #0284c7 0%, #2563eb 50%, #1d4ed8 100%);
+      border: 1px solid #7dd3fc;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 0.86rem;
+      padding: 11px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.55);
+      transition: all 0.2s ease;
+    }
+
+    .next-step-btn:hover:not(:disabled) {
+      filter: brightness(1.14);
+      box-shadow: 0 0 24px rgba(56, 189, 248, 0.85);
+    }
+
+    .error-msg {
+      color: #fda4af;
+      font-size: 0.74rem;
+      margin-bottom: 7px;
+      display: none;
+      font-weight: 600;
+    }
+
+    /* BARRAS INFERIORES DE LECTURA */
+    .reading-bars-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .reading-bar {
+      width: 100%;
+      background: rgba(11, 22, 44, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      border-left: 4px solid #fbbf24;
+      border-radius: 12px;
+      padding: 13px 16px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      cursor: pointer;
+    }
+
+    .reading-bar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.88rem;
+      color: #e2e8f0;
+    }
+
+    .reading-content {
+      margin-top: 9px;
+      padding-top: 9px;
+      border-top: 1px solid rgba(71, 85, 105, 0.45);
+      font-size: 0.85rem;
+      line-height: 1.55;
+      color: #e2e8f0;
+      white-space: pre-line;
+    }
+
+    /* MODALES */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 9, 20, 0.88);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+
+    .modal-box {
+      width: 100%;
+      max-width: 430px;
+      background: linear-gradient(160deg, rgba(16, 32, 62, 0.96), rgba(8, 17, 36, 0.98));
+      border: 1.5px solid rgba(251, 191, 36, 0.65);
+      box-shadow: 0 0 40px rgba(251, 191, 36, 0.25);
+      border-radius: 18px;
+      padding: 26px 22px;
+      text-align: center;
+    }
+
+    .modal-input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      background: rgba(7, 14, 29, 0.92);
+      color: #fff;
+      font-size: 0.95rem;
+      margin: 12px 0 16px;
+      outline: none;
+      user-select: text;
+      -webkit-user-select: text;
+    }
+
+    @media (max-width: 620px) {
+      .stage-wrapper {
+        height: 700px;
+      }
+      .holo-quiz-card {
+        width: 94%;
+        right: 3%;
+        bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-shell">
+    <h1 class="main-title">La Escalera del Saber</h1>
+    <p class="subtitle">INSTITUCIÓN EDUCATIVA TÉCNICA REMEDIOS SOLANO · Post-test de Comprensión Lectora</p>
+
+    <div class="top-bar">
+      <div class="user-badge">
+        <span>🎒</span>
+        <span id="student-label">Explorador</span>
+      </div>
+      <div class="score-badge" id="score-badge">
+        <span>⭐</span>
+        <span id="score-label">0 / 100 pts</span>
+      </div>
+      <div class="floating-points" id="floating-points">+5 pts ⭐</div>
+    </div>
+
+    <div class="stage-wrapper">
+      <canvas id="fantasy-canvas"></canvas>
+
+      <div class="holo-quiz-card" id="quiz-card">
+        <div class="level-pill" id="level-pill">PREGUNTA 1 DE 20</div>
+        <div class="question-title" id="question-title"></div>
+
+        <div class="options-list" id="options-list"></div>
+
+        <div class="feedback-banner" id="feedback-banner">
+          <span id="feedback-text">¡Respuesta Correcta!</span>
+          <span id="feedback-pts">+5 PTS</span>
+        </div>
+
+        <div class="error-msg" id="error-msg">Responde la pregunta para subir de escalón.</div>
+
+        <button class="next-step-btn" id="next-btn">
+          <span>Subir al Siguiente Escalón</span>
+          <span>➔</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="reading-bars-container">
+      <div class="reading-bar" onclick="toggleReadingBody()">
+        <div class="reading-bar-header">
+          <div>
+            <strong id="reading-bar-title-1">TEXTO 1. EL HOMBRE CAIMÁN</strong>
+            <span style="color:#94a3b8; font-size:0.8rem;" id="reading-bar-sub-1"> (Toque para ocultar/mostrar lectura)</span>
+          </div>
+          <span style="color:#fbbf24; font-size:0.8rem; font-weight:700;">📜 Lectura</span>
+        </div>
+        <div class="reading-content" id="reading-text-content"></div>
+      </div>
+
+      <div class="reading-bar" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+        <div class="reading-bar-header">
+          <div>
+            <strong id="reading-bar-title-2">TEXTO 1. EL HOMBRE CAIMÁN</strong>
+            <span style="color:#94a3b8; font-size:0.8rem;" id="reading-bar-sub-2">(Preguntas 1 a 5)</span>
+          </div>
+          <span style="color:#7dd3fc; font-size:0.8rem; font-weight:600;" id="progress-footer">Peldaño 1 de 20</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL INICIAL -->
+  <div class="modal-backdrop" id="start-modal">
+    <div class="modal-box">
+      <div style="font-size:2.5rem; margin-bottom:6px;">🧭</div>
+      <h2 style="font-size:1.4rem; font-weight:800; color:#fde047; margin-bottom:6px;">
+        El Conocimiento te lleva más lejos
+      </h2>
+      <p style="font-size:0.86rem; color:#cbd5e1; line-height:1.45;">
+        INSTRUMENTO 4: Post-test de comprensión lectora (Lengua Castellana). Ingresa tu nombre completo para iniciar el ascenso hacia el Castillo del Saber.
+      </p>
+      <input
+        type="text"
+        id="student-name-input"
+        class="modal-input"
+        placeholder="Escribe tu nombre completo..."
+      />
+      <p id="name-error" style="color:#fda4af; font-size:0.78rem; margin-bottom:10px; display:none;">
+        Por favor ingresa tu nombre para comenzar.
+      </p>
+      <button class="next-step-btn" id="start-game-btn">
+        Comenzar Aventura ➔
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL FINAL -->
+  <div class="modal-backdrop" id="end-modal" style="display:none;">
+    <div class="modal-box">
+      <div style="font-size:2.9rem; margin-bottom:6px;">🏰✨</div>
+      <h2 style="font-size:1.45rem; font-weight:800; color:#fde047; margin-bottom:6px;">
+        ¡Llegaste al Castillo del Saber!
+      </h2>
+      <p id="end-student-name" style="font-size:0.95rem; color:#7dd3fc; font-weight:600; margin-bottom:14px;"></p>
+      <div style="background:rgba(7,14,29,0.92); border:1px solid rgba(251,191,36,0.45); border-radius:12px; padding:14px; margin-bottom:14px;">
+        <div style="font-size:0.75rem; color:#94a3b8; text-transform:uppercase;">Puntaje Final</div>
+        <div id="end-score" style="font-size:2.1rem; font-weight:800; color:#fbbf24; margin-top:4px;">0 / 100 pts</div>
+      </div>
+      <p id="sheet-status" style="font-size:0.82rem; color:#cbd5e1; margin-bottom:16px;">
+        Enviando tus respuestas a Google Sheets...
+      </p>
+      <button class="next-step-btn" onclick="location.reload()">
+        Jugar de Nuevo ↻
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // URL DE GOOGLE SHEETS
+    // =========================================================================
+    const GOOGLE_SHEETS_URL = "https://script.google.com/macros/s/AKfycbytCtvdVflBZiNVcwKGcPPJqD0VT13g-aVdMMbtuI3gv1O5SMkEZ4-4hATi-h8IsqQ3AQ/exec";
+
+    // =========================================================================
+    // SONIDOS Y CONFETIS
+    // =========================================================================
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playSound(type) {
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === "suspended") audioCtx.resume();
+        const now = audioCtx.currentTime;
+        if (type === "correct") {
+          [523.25, 659.25, 783.99, 1046.5].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(freq, now + i * 0.07);
+            gain.gain.setValueAtTime(0.18, now + i * 0.07);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.07 + 0.28);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now + i * 0.07);
+            osc.stop(now + i * 0.07 + 0.28);
+          });
+        } else {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(210, now);
+          osc.frequency.linearRampToValueAtTime(135, now + 0.3);
+          gain.gain.setValueAtTime(0.13, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.34);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.34);
+        }
+      } catch (e) {}
+    }
+
+    function launchSuccessConfetti() {
+      if (typeof confetti !== "function") return;
+      confetti({
+        particleCount: 80,
+        spread: 72,
+        origin: { x: 0.62, y: 0.62 },
+        colors: ["#fde047", "#38bdf8", "#4ade80", "#f59e0b", "#ffffff"]
+      });
+    }
+
+    function launchVictoryConfetti() {
+      if (typeof confetti !== "function") return;
+      const end = Date.now() + 3000;
+      (function frame() {
+        confetti({ particleCount: 6, angle: 60, spread: 55, origin: { x: 0 }, colors: ["#fde047", "#38bdf8", "#4ade80"] });
+        confetti({ particleCount: 6, angle: 120, spread: 55, origin: { x: 1 }, colors: ["#fde047", "#38bdf8", "#4ade80"] });
+        if (Date.now() < end) requestAnimationFrame(frame);
+      })();
+    }
+
+    // =========================================================================
+    // TEXTOS BASE EXACTOS DEL INSTRUMENTO 4
+    // =========================================================================
+    const TEXTO_1 = `Cuenta la tradición oral de la región Caribe colombiana que hace muchos años vivía un hombre llamado Saúl Montenegro, quien sentía una enorme curiosidad por observar a las mujeres cuando se bañaban en el río Magdalena. Obsesionado con este deseo, decidió acudir a un hechicero indígena para que le preparara una pócima que le permitiera transformarse en animal sin ser descubierto.
+
+El hechicero le entregó dos frascos: uno contenía el líquido que lo convertiría en caimán y el otro le devolvería su apariencia humana. Durante algún tiempo, Saúl logró llevar a cabo sus transformaciones sin que nadie sospechara de él. Sin embargo, un día, mientras realizaba el procedimiento, su ayudante se asustó al verlo convertido en caimán y dejó caer accidentalmente el frasco que debía devolverle su forma humana.
+
+La pócima solo alcanzó a tocar su rostro, por lo que Saúl quedó transformado para siempre en una extraña criatura con cuerpo de caimán y cabeza de hombre. Desde entonces, según cuentan los pescadores, su figura continúa apareciendo en algunos lugares del río, recordando las consecuencias de los actos motivados por la curiosidad desmedida y la falta de respeto hacia los demás.`;
+
+    const TEXTO_2 = `En numerosas regiones rurales de Colombia se habla de un misterioso ser conocido como la Madremonte. Según los relatos de campesinos y viajeros, se trata de una mujer gigantesca cubierta de hojas, musgo y ramas que protege los bosques, las montañas y las fuentes de agua.
+
+Se dice que aparece especialmente durante las tormentas o en momentos en que los seres humanos causan daños a la naturaleza. Quienes han afirmado verla cuentan que su presencia provoca fuertes lluvias, vientos intensos y extraños sonidos que parecen surgir desde lo más profundo de la selva.
+
+La tradición sostiene que la Madremonte castiga a quienes invaden terrenos ajenos, contaminan los ríos o destruyen los bosques sin justificación. Por esta razón, muchas comunidades consideran esta leyenda una forma de transmitir valores relacionados con el respeto por el medio ambiente y la convivencia armónica con la naturaleza.`;
+
+    const TEXTO_3 = `Los antiguos Wayuu cuentan que, cuando el mundo era joven, los colores vivían separados y cada uno se consideraba más importante que los demás. El rojo presumía de su fuerza; el azul, de su serenidad; el amarillo, de su brillo; y así ocurría con todos los colores.
+
+Un día apareció Juya, espíritu relacionado con la lluvia, quien observó que las constantes discusiones estaban afectando el equilibrio del mundo. Entonces decidió reunirlos y mostrarles que cada uno poseía cualidades valiosas que podían complementarse mutuamente.
+
+Después de una intensa lluvia, Juya extendió todos los colores en el cielo formando una gran banda luminosa. Desde entonces, el arcoíris recuerda a las personas la importancia de la diversidad, la cooperación y el respeto por las diferencias.`;
+
+    const TEXTO_4 = `La leyenda de la Llorona es conocida en muchos países de América Latina. Según la tradición, se trata del espíritu de una mujer que recorre caminos, ríos y pueblos durante la noche, emiting lamentos que estremecen a quienes los escuchan.
+
+Existen diferentes versiones de la historia, pero la mayoría coincide en que la mujer sufrió una profunda pérdida y desde entonces vaga buscando aquello que perdió. Los relatos afirman que sus llantos sirven como advertencia para quienes transitan solos durante la noche o desobedecen las recomendaciones de sus familias.
+
+A lo largo del tiempo, esta leyenda ha permanecido viva gracias a la transmisión oral realizada por padres, abuelos y miembros de la comunidad, convirtiéndose en parte importante del patrimonio cultural de numerosos pueblos.`;
+
+    const TEXTO_5 = `Observa el siguiente poster y responde las preguntas 19 y 20 de acuerdo a la información que está en él.`;
+
+    // =========================================================================
+    // LAS 20 PREGUNTAS EXACTAS TAL CUAL ESTÁN EN EL DOCUMENTO (ORDEN FIJO)
+    // =========================================================================
+    const QUESTIONS = [
+      // --- BLOQUE 1: TEXTO 1. EL HOMBRE CAIMÁN (Preguntas 1 a 5) ---
+      {
+        step: 1,
+        type: "mc",
+        title: "TEXTO 1. EL HOMBRE CAIMÁN",
+        sub: "(Preguntas 1 a 5)",
+        text: TEXTO_1,
+        badge: "TEXTO 1 · ESCALÓN 1 DE 20",
+        question: "A. El propósito principal del texto es:",
+        options: [
+          "A. Explicar científicamente la existencia de reptiles en el río Magdalena.",
+          "B. Narrar una historia tradicional que transmite una enseñanza sobre las consecuencias de ciertos comportamientos humanos.",
+          "C. Describir las costumbres de los pueblos indígenas de la región Caribe.",
+          "D. Informar sobre las características físicas de los caimanes que habitan Colombia."
+        ],
+        correct: 1
+      },
+      {
+        step: 2,
+        type: "mc",
+        title: "TEXTO 1. EL HOMBRE CAIMÁN",
+        sub: "(Preguntas 1 a 5)",
+        text: TEXTO_1,
+        badge: "TEXTO 1 · ESCALÓN 2 DE 20",
+        question: "B. Cuando el texto afirma que Saúl actuó movido por una \"curiosidad desmedida\", se puede inferir que:",
+        options: [
+          "A. Su comportamiento sobrepasó los límites aceptados social y moralmente.",
+          "B. Poseía habilidades extraordinarias para resolver problemas complejos.",
+          "C. Quería convertirse en animal para proteger el ecosistema del río.",
+          "D. Buscaba demostrar que los hechiceros poseían poderes reales."
+        ],
+        correct: 0
+      },
+      {
+        step: 3,
+        type: "mc",
+        title: "TEXTO 1. EL HOMBRE CAIMÁN",
+        sub: "(Preguntas 1 a 5)",
+        text: TEXTO_1,
+        badge: "TEXTO 1 · ESCALÓN 3 DE 20",
+        question: "C. La expresión \"quedó transformado para siempre\" permite concluir que:",
+        options: [
+          "1. La transformación fue temporal.",
+          "2. El personaje logró recuperar su apariencia años después.",
+          "3. El castigo recibido tuvo un carácter irreversible.",
+          "4. El ayudante encontró una solución al problema."
+        ],
+        correct: 2
+      },
+      {
+        step: 4,
+        type: "mc",
+        title: "TEXTO 1. EL HOMBRE CAIMÁN",
+        sub: "(Preguntas 1 a 5)",
+        text: TEXTO_1,
+        badge: "TEXTO 1 · ESCALÓN 4 DE 20",
+        question: "D. ¿Cuál de las siguientes afirmaciones resume mejor la enseñanza del relato?",
+        options: [
+          "1. Las personas deben aprender a convivir con los animales.",
+          "2. Los secretos siempre terminan siendo descubiertos.",
+          "3. Las acciones irrespetuosas pueden generar consecuencias negativas permanentes.",
+          "4. La magia es más poderosa que la voluntad humana."
+        ],
+        correct: 2
+      },
+      {
+        step: 5,
+        type: "open",
+        title: "TEXTO 1. EL HOMBRE CAIMÁN",
+        sub: "(Preguntas 1 a 5)",
+        text: TEXTO_1,
+        badge: "TEXTO 1 · ESCALÓN 5 DE 20",
+        question: "E. Explica con tus palabras por qué esta historia puede considerarse una leyenda de tradición oral."
+      },
+
+      // --- BLOQUE 2: TEXTO 2. LA MADREMONTE (Preguntas 6 a 10) ---
+      {
+        step: 6,
+        type: "mc",
+        title: "TEXTO 2. LA MADREMONTE",
+        sub: "(Preguntas 6 a 10)",
+        text: TEXTO_2,
+        badge: "TEXTO 2 · ESCALÓN 6 DE 20",
+        question: "1. Según el texto, la función principal de la Madremonte dentro de la tradición oral es:",
+        options: [
+          "1. Representar la riqueza económica de las zonas rurales.",
+          "2. Simbolizar la protección de la naturaleza y sus recursos.",
+          "3. Explicar el origen de las tormentas tropicales.",
+          "4. Describir las costumbres de las comunidades indígenas."
+        ],
+        correct: 1
+      },
+      {
+        step: 7,
+        type: "mc",
+        title: "TEXTO 2. LA MADREMONTE",
+        sub: "(Preguntas 6 a 10)",
+        text: TEXTO_2,
+        badge: "TEXTO 2 · ESCALÓN 7 DE 20",
+        question: "2. ¿Cuál de los siguientes comportamientos sería más probable que provocara la aparición de la Madremonte?",
+        options: [
+          "1. La realización de actividades deportivas en un parque.",
+          "2. La organización de una celebración comunitaria.",
+          "3. La contaminación de una fuente hídrica por parte de una empresa.",
+          "4. El desarrollo de programas de reforestación."
+        ],
+        correct: 2
+      },
+      {
+        step: 8,
+        type: "mc",
+        title: "TEXTO 2. LA MADREMONTE",
+        sub: "(Preguntas 6 a 10)",
+        text: TEXTO_2,
+        badge: "TEXTO 2 · ESCALÓN 8 DE 20",
+        question: "3. La relación entre la Madremonte y las tormentas permite interpretar que:",
+        options: [
+          "F. El personaje simboliza la fuerza de la naturaleza frente a las acciones humanas.",
+          "G. Los fenómenos climáticos son provocados únicamente por seres sobrenaturales.",
+          "H. Todas las lluvias tienen origen en leyendas populares.",
+          "1. Los campesinos desconocen las causas de los fenómenos naturales."
+        ],
+        correct: 0
+      },
+      {
+        step: 9,
+        type: "mc",
+        title: "TEXTO 2. LA MADREMONTE",
+        sub: "(Preguntas 6 a 10)",
+        text: TEXTO_2,
+        badge: "TEXTO 2 · ESCALÓN 9 DE 20",
+        question: "4. ¿Qué intención comunicativa predomina en el texto?",
+        options: [
+          "F. Convencer sobre la existencia científica de la Madremonte.",
+          "G. Relatar una tradición oral y transmitir valores ambientales.",
+          "H. Enseñar técnicas de conservación forestal.",
+          "1. Describir especies vegetales de Colombia."
+        ],
+        correct: 1
+      },
+      {
+        step: 10,
+        type: "open",
+        title: "TEXTO 2. LA MADREMONTE",
+        sub: "(Preguntas 6 a 10)",
+        text: TEXTO_2,
+        badge: "TEXTO 2 · ESCALÓN 10 DE 20",
+        question: "5. ¿Consideras que las leyendas pueden contribuir al cuidado del medio ambiente? Justifica tu respuesta."
+      },
+
+      // --- BLOQUE 3: TEXTO 3. EL ORIGEN DEL ARCOÍRIS (MITO WAYUU) (Preguntas 11 a 15) ---
+      {
+        step: 11,
+        type: "mc",
+        title: "TEXTO 3. EL ORIGEN DEL ARCOÍRIS (MITO WAYUU)",
+        sub: "(Preguntas 11 a 15)",
+        text: TEXTO_3,
+        badge: "TEXTO 3 · ESCALÓN 11 DE 20",
+        question: "6. El conflicto principal del mito surge porque:",
+        options: [
+          "F. Los colores desaparecieron del mundo.",
+          "G. Los colores competían entre sí por sentirse superiores.",
+          "H. Juya quería controlar a los demás espíritus.",
+          "I. El arcoíris destruyó el equilibrio natural."
+        ],
+        correct: 1
+      },
+      {
+        step: 12,
+        type: "mc",
+        title: "TEXTO 3. EL ORIGEN DEL ARCOÍRIS (MITO WAYUU)",
+        sub: "(Preguntas 11 a 15)",
+        text: TEXTO_3,
+        badge: "TEXTO 3 · ESCALÓN 12 DE 20",
+        question: "7. La intervención de Juya permite comprender que:",
+        options: [
+          "F. Los conflictos deben resolverse mediante la colaboración y el reconocimiento mutuo.",
+          "G. Los colores deben permanecer separados.",
+          "H. Las diferencias generan problemas imposibles de solucionar.",
+          "I. La lluvia tiene únicamente funciones climáticas."
+        ],
+        correct: 0
+      },
+      {
+        step: 13,
+        type: "mc",
+        title: "TEXTO 3. EL ORIGEN DEL ARCOÍRIS (MITO WAYUU)",
+        sub: "(Preguntas 11 a 15)",
+        text: TEXTO_3,
+        badge: "TEXTO 3 · ESCALÓN 13 DE 20",
+        question: "8. El mensaje central del mito se relaciona con:",
+        options: [
+          "F. La importancia de la obediencia.",
+          "G. El origen de los fenómenos naturales.",
+          "H. El valor de la diversidad y la convivencia.",
+          "I. La necesidad de evitar la lluvia."
+        ],
+        correct: 2
+      },
+      {
+        step: 14,
+        type: "mc",
+        title: "TEXTO 3. EL ORIGEN DEL ARCOÍRIS (MITO WAYUU)",
+        sub: "(Preguntas 11 a 15)",
+        text: TEXTO_3,
+        badge: "TEXTO 3 · ESCALÓN 14 DE 20",
+        question: "9. ¿Por qué este relato puede clasificarse como un mito?",
+        options: [
+          "F. Porque explica simbólicamente el origen de un elemento de la naturaleza.",
+          "G. Porque relata un hecho histórico comprobado.",
+          "H. Porque describe costumbres agrícolas.",
+          "I. Porque presenta personajes reales."
+        ],
+        correct: 0
+      },
+      {
+        step: 15,
+        type: "open",
+        title: "TEXTO 3. EL ORIGEN DEL ARCOÍRIS (MITO WAYUU)",
+        sub: "(Preguntas 11 a 15)",
+        text: TEXTO_3,
+        badge: "TEXTO 3 · ESCALÓN 15 DE 20",
+        question: "10. Explica cómo el mensaje del mito puede aplicarse a la convivencia escolar."
+      },
+
+      // --- BLOQUE 4: TEXTO 4. LA LLORONA (Preguntas 16 a 18) ---
+      {
+        step: 16,
+        type: "mc",
+        title: "TEXTO 4. LA LLORONA",
+        sub: "(Preguntas 16 a 18)",
+        text: TEXTO_4,
+        badge: "TEXTO 4 · ESCALÓN 16 DE 20",
+        question: "11. La expresión \"patrimonio cultural\" hace referencia a:",
+        options: [
+          "F. Los recursos económicos de una comunidad.",
+          "G. Los conocimientos, tradiciones y manifestaciones que identifican a un pueblo.",
+          "H. Las construcciones antiguas exclusivamente.",
+          "1. Los fenómenos sobrenaturales."
+        ],
+        correct: 1
+      },
+      {
+        step: 17,
+        type: "mc",
+        title: "TEXTO 4. LA LLORONA",
+        sub: "(Preguntas 16 a 18)",
+        text: TEXTO_4,
+        badge: "TEXTO 4 · ESCALÓN 17 DE 20",
+        question: "12. ¿Cuál de las siguientes afirmaciones refleja mejor la importancia de los mitos y las leyendas?",
+        options: [
+          "A. Son relatos sin ninguna utilidad para las comunidades.",
+          "B. Únicamente sirven para entretener a los niños.",
+          "C. Contribuyen a preservar la identidad cultural y transmitir enseñanzas.",
+          "D. Sustituyen completamente el conocimiento científico."
+        ],
+        correct: 2
+      },
+      {
+        step: 18,
+        type: "open",
+        title: "TEXTO 4. LA LLORONA",
+        sub: "(Preguntas 16 a 18)",
+        text: TEXTO_4,
+        badge: "TEXTO 4 · ESCALÓN 18 DE 20",
+        question: "13. Reflexiona y responde: ¿Por qué es importante conservar los mitos y las leyendas de una comunidad como parte de la tradición oral?"
+      },
+
+      // --- BLOQUE 5: TEXTO DISCONTINUO / POSTER (Preguntas 19 y 20) ---
+      {
+        step: 19,
+        type: "mc",
+        title: "1. Observa el siguiente poster y responde las preguntas 19 y 20",
+        sub: "(Preguntas 19 y 20)",
+        text: TEXTO_5,
+        badge: "POSTER · ESCALÓN 19 DE 20",
+        question: "14. ¿Cuál es el propósito principal de este texto discontinuo?",
+        options: [
+          "A. Narrar una leyenda tradicional colombiana.",
+          "B. Informar a la comunidad educativa sobre las actividades de un evento cultural.",
+          "C. Explicar el origen de los mitos y leyendas.",
+          "D. Convencer a los estudiantes de participar en concursos literarios."
+        ],
+        correct: 1
+      },
+      {
+        step: 20,
+        type: "open",
+        title: "1. Observa el siguiente poster y responde las preguntas 19 y 20",
+        sub: "(Preguntas 19 y 20)",
+        text: TEXTO_5,
+        badge: "POSTER · ESCALÓN 20 DE 20",
+        question: "14. ¿Consideras que eventos como este pueden contribuir a preservar la tradición oral de una comunidad? Explica tu respuesta utilizando información del poster."
+      }
+    ];
+
+    // =========================================================================
+    // ESTADO DEL JUEGO
+    // =========================================================================
+    const TOTAL_QUESTIONS = QUESTIONS.length; // 20
+    const POINTS_PER_QUESTION = 5;            // 20 * 5 = 100 pts
+
+    let studentName = "";
+    let currentIdx = 0;
+    let selectedOpt = null;
+    let openAnswerText = "";
+    let isEvaluating = false;
+    let score = 0;
+    let recordedAnswers = new Array(TOTAL_QUESTIONS).fill(null);
+
+    let visualStep = 0;
+    let targetStep = 0;
+    let jumpAnim = 1;
+
+    // =========================================================================
+    // ESCENARIO VISUAL 3D
+    // =========================================================================
+    const canvas = document.getElementById("fantasy-canvas");
+    const ctx = canvas.getContext("2d");
+
+    const stars = Array.from({ length: 65 }, () => ({
+      x: Math.random(),
+      y: Math.random() * 0.55,
+      r: Math.random() * 1.7 + 0.4,
+      a: Math.random() * 0.8 + 0.2
+    }));
+
+    function resizeCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = canvas.clientWidth * dpr;
+      canvas.height = canvas.clientHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function drawFloatingIsland(x, y, scale, t, hasTemple) {
+      ctx.save();
+      ctx.translate(x, y + Math.sin(t + x) * 4);
+      ctx.scale(scale, scale);
+
+      const rockGrad = ctx.createLinearGradient(0, 0, 0, 145);
+      rockGrad.addColorStop(0, "#5c4d42");
+      rockGrad.addColorStop(0.5, "#3b3130");
+      rockGrad.addColorStop(1, "#1e1b24");
+      ctx.fillStyle = rockGrad;
+
+      ctx.beginPath();
+      ctx.moveTo(-115, 0);
+      ctx.lineTo(-85, 70);
+      ctx.lineTo(-40, 115);
+      ctx.lineTo(0, 150);
+      ctx.lineTo(48, 110);
+      ctx.lineTo(95, 58);
+      ctx.lineTo(120, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "rgba(15, 23, 42, 0.45)";
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(0, 150);
+      ctx.lineTo(48, 110);
+      ctx.lineTo(95, 58);
+      ctx.lineTo(120, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      const grassGrad = ctx.createLinearGradient(-115, -22, 115, 10);
+      grassGrad.addColorStop(0, "#4ade80");
+      grassGrad.addColorStop(0.5, "#22c55e");
+      grassGrad.addColorStop(1, "#15803d");
+      ctx.fillStyle = grassGrad;
+
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 122, 24, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const treePositions = [-75, -35, 45, 80];
+      treePositions.forEach((tx, idx) => {
+        ctx.fillStyle = idx % 2 === 0 ? "#166534" : "#15803d";
+        ctx.beginPath();
+        ctx.arc(tx, -18, 18, 0, Math.PI * 2);
+        ctx.arc(tx + 10, -14, 14, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      if (hasTemple) {
+        ctx.fillStyle = "#e2e8f0";
+        ctx.fillRect(-22, -48, 44, 34);
+        ctx.fillStyle = "#38bdf8";
+        ctx.beginPath();
+        ctx.moveTo(-28, -48);
+        ctx.lineTo(0, -72);
+        ctx.lineTo(28, -48);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      const wfGrad = ctx.createLinearGradient(0, 5, 0, 175);
+      wfGrad.addColorStop(0, "rgba(186, 230, 253, 0.95)");
+      wfGrad.addColorStop(0.6, "rgba(56, 189, 248, 0.75)");
+      wfGrad.addColorStop(1, "rgba(56, 189, 248, 0)");
+      ctx.fillStyle = wfGrad;
+
+      ctx.beginPath();
+      ctx.moveTo(-18, 8);
+      ctx.lineTo(14, 8);
+      ctx.lineTo(24, 175);
+      ctx.lineTo(-28, 175);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.75)";
+      ctx.lineWidth = 2;
+      for (let k = 0; k < 4; k++) {
+        const wy = ((t * 45 + k * 40) % 150) + 10;
+        ctx.beginPath();
+        ctx.moveTo(-8 + (k - 1.5) * 6, wy);
+        ctx.lineTo(-8 + (k - 1.5) * 6, wy + 18);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawGoldenCastle(cx, cy, t) {
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      const glow = ctx.createRadialGradient(0, -55, 8, 0, -55, 115);
+      glow.addColorStop(0, "rgba(254, 240, 138, 0.95)");
+      glow.addColorStop(0.45, "rgba(251, 191, 36, 0.45)");
+      glow.addColorStop(1, "rgba(245, 158, 11, 0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(0, -55, 115, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawFloatingIsland(0, 15, 0.72, t, false);
+
+      const wallGrad = ctx.createLinearGradient(-45, -80, 45, 5);
+      wallGrad.addColorStop(0, "#fef08a");
+      wallGrad.addColorStop(0.5, "#f59e0b");
+      wallGrad.addColorStop(1, "#b45309");
+      ctx.fillStyle = wallGrad;
+
+      ctx.fillRect(-52, -52, 22, 58);
+      ctx.fillRect(30, -52, 22, 58);
+      ctx.fillRect(-30, -72, 60, 78);
+
+      ctx.fillStyle = "#d97706";
+      ctx.beginPath();
+      ctx.moveTo(-56, -52);
+      ctx.lineTo(-41, -78);
+      ctx.lineTo(-26, -52);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(26, -52);
+      ctx.lineTo(41, -78);
+      ctx.lineTo(56, -52);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.beginPath();
+      ctx.moveTo(-34, -72);
+      ctx.lineTo(0, -110);
+      ctx.lineTo(34, -72);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = "#fef9c3";
+      ctx.shadowColor = "#fde047";
+      ctx.shadowBlur = 18;
+      ctx.beginPath();
+      ctx.arc(0, -16, 13, Math.PI, 0);
+      ctx.lineTo(13, 6);
+      ctx.lineTo(-13, 6);
+      ctx.closePath();
+      ctx.fill();
+
+      drawGlowingStar(0, -122, 22, 9, t * 2);
+
+      ctx.restore();
+    }
+
+    function drawGlowingStar(cx, cy, outerR, innerR, pulse) {
+      ctx.save();
+      ctx.translate(cx, cy + Math.sin(pulse) * 2.5);
+      ctx.shadowColor = "#fde047";
+      ctx.shadowBlur = 18;
+
+      ctx.fillStyle = "#fef08a";
+      ctx.strokeStyle = "#f59e0b";
+      ctx.lineWidth = 1.5;
+
+      ctx.beginPath();
+      for (let i = 0; i < 10; i++) {
+        const r = i % 2 === 0 ? outerR : innerR;
+        const angle = (i * Math.PI) / 5 - Math.PI / 2;
+        const x = Math.cos(angle) * r;
+        const y = Math.sin(angle) * r;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawPadlock3D(cx, cy, labelNum) {
+      ctx.save();
+      ctx.translate(cx, cy - 16);
+
+      ctx.strokeStyle = "#cbd5e1";
+      ctx.lineWidth = 3.5;
+      ctx.beginPath();
+      ctx.arc(0, -8, 8, Math.PI, 0);
+      ctx.stroke();
+
+      const bodyGrad = ctx.createLinearGradient(-12, -8, 12, 12);
+      bodyGrad.addColorStop(0, "#f8fafc");
+      bodyGrad.addColorStop(1, "#94a3b8");
+      ctx.fillStyle = bodyGrad;
+      ctx.shadowColor = "rgba(15, 23, 42, 0.7)";
+      ctx.shadowBlur = 8;
+      ctx.beginPath();
+      ctx.roundRect(-13, -8, 26, 21, 5);
+      ctx.fill();
+
+      ctx.fillStyle = "#1e293b";
+      ctx.beginPath();
+      ctx.arc(0, 0, 2.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillRect(-1.3, 0, 2.6, 6);
+
+      ctx.fillStyle = "#fde047";
+      ctx.font = "800 10px Inter, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(`#${labelNum}`, 0, -19);
+
+      ctx.restore();
+    }
+
+    function drawStoneStep(cx, cy, scale, state, stepNum, t) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scale, scale);
+
+      const rw = 82;
+      const rh = 32;
+      const depth = 24;
+
+      ctx.fillStyle = "rgba(2, 6, 23, 0.55)";
+      ctx.beginPath();
+      ctx.ellipse(0, depth + 8, rw * 0.9, rh * 0.75, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      const sideGrad = ctx.createLinearGradient(-rw, 0, rw, depth);
+      sideGrad.addColorStop(0, "#57493f");
+      sideGrad.addColorStop(0.5, "#786557");
+      sideGrad.addColorStop(1, "#3e332c");
+      ctx.fillStyle = sideGrad;
+
+      ctx.beginPath();
+      ctx.moveTo(-rw, 0);
+      ctx.lineTo(-rw + 10, depth);
+      ctx.lineTo(0, rh + depth);
+      ctx.lineTo(rw - 10, depth);
+      ctx.lineTo(rw, 0);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.strokeStyle = "#29211c";
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(-32, rh * 0.6);
+      ctx.lineTo(-28, rh * 0.6 + depth * 0.8);
+      ctx.moveTo(26, rh * 0.65);
+      ctx.lineTo(22, rh * 0.65 + depth * 0.85);
+      ctx.stroke();
+
+      const topGrad = ctx.createLinearGradient(-rw, -rh, rw, rh);
+      topGrad.addColorStop(0, "#a89686");
+      topGrad.addColorStop(0.5, "#8c7867");
+      topGrad.addColorStop(1, "#6b5a4c");
+      ctx.fillStyle = topGrad;
+
+      ctx.beginPath();
+      ctx.moveTo(-rw, 0);
+      ctx.lineTo(-rw * 0.55, -rh);
+      ctx.lineTo(rw * 0.55, -rh);
+      ctx.lineTo(rw, 0);
+      ctx.lineTo(rw * 0.6, rh);
+      ctx.lineTo(-rw * 0.6, rh);
+      ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = "#cbbba8";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      if (state === "active") {
+        ctx.shadowColor = "#38bdf8";
+        ctx.shadowBlur = 22;
+        ctx.strokeStyle = "#38bdf8";
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 48, 17, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#e0f2fe";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 39, 13, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      } else {
+        ctx.shadowColor = "#fbbf24";
+        ctx.shadowBlur = 18;
+        ctx.strokeStyle = "#fbbf24";
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 44, 15, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.strokeStyle = "#fef08a";
+        ctx.lineWidth = 1.6;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 35, 11, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        if (state === "done") {
+          drawGlowingStar(0, -12, 14, 6, t + stepNum);
+        } else {
+          drawGlowingStar(0, -10, 12, 5, t + stepNum);
+          drawPadlock3D(-34, -8, stepNum);
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function drawWoodenSignpost(x, y) {
+      ctx.save();
+      ctx.translate(x, y);
+
+      ctx.fillStyle = "#15803d";
+      ctx.beginPath();
+      ctx.arc(-40, 95, 28, 0, Math.PI * 2);
+      ctx.arc(25, 102, 24, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#5c3a21";
+      ctx.fillRect(-10, -68, 20, 165);
+      ctx.strokeStyle = "#3b2313";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(-10, -68, 20, 165);
+
+      ctx.rotate(-0.06);
+      const boardGrad = ctx.createLinearGradient(-95, -55, 95, 55);
+      boardGrad.addColorStop(0, "#854d27");
+      boardGrad.addColorStop(0.5, "#6e3d1c");
+      boardGrad.addColorStop(1, "#4a2711");
+      ctx.fillStyle = boardGrad;
+
+      ctx.shadowColor = "rgba(0,0,0,0.6)";
+      ctx.shadowBlur = 14;
+      ctx.beginPath();
+      ctx.roundRect(-96, -54, 192, 106, 8);
+      ctx.fill();
+
+      ctx.lineWidth = 2.5;
+      ctx.strokeStyle = "#a16236";
+      ctx.stroke();
+
+      ctx.strokeStyle = "rgba(42, 20, 8, 0.45)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(-92, -18);
+      ctx.lineTo(92, -18);
+      ctx.moveTo(-92, 18);
+      ctx.lineTo(92, 18);
+      ctx.stroke();
+
+      ctx.fillStyle = "#fffbeb";
+      ctx.font = "700 18px 'Kalam', cursive";
+      ctx.textAlign = "center";
+      ctx.fillText("El conocimiento", 0, -24);
+      ctx.fillText("te lleva más lejos", 0, -2);
+
+      ctx.strokeStyle = "#fffbeb";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 26, 15, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.fillStyle = "#fde047";
+      ctx.beginPath();
+      ctx.moveTo(0, 13);
+      ctx.lineTo(4, 26);
+      ctx.lineTo(0, 39);
+      ctx.lineTo(-4, 26);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawExplorerBoy(cx, cy, scale, bounce) {
+      ctx.save();
+      ctx.translate(cx, cy + bounce);
+      ctx.scale(scale, scale);
+
+      ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+      ctx.beginPath();
+      ctx.ellipse(0, 2, 22, 8, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#f8fafc";
+      ctx.beginPath();
+      ctx.roundRect(-16, -5, 13, 7, 3);
+      ctx.roundRect(4, -5, 13, 7, 3);
+      ctx.fill();
+
+      ctx.fillStyle = "#1e293b";
+      ctx.beginPath();
+      ctx.roundRect(-16, -9, 13, 6, 3);
+      ctx.roundRect(4, -9, 13, 6, 3);
+      ctx.fill();
+
+      ctx.fillStyle = "#172554";
+      ctx.beginPath();
+      ctx.roundRect(-14, -36, 11, 29, 4);
+      ctx.roundRect(3, -36, 11, 29, 4);
+      ctx.fill();
+
+      ctx.fillStyle = "#f1f5f9";
+      ctx.beginPath();
+      ctx.roundRect(-16, -68, 32, 34, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "#fDBA74";
+      ctx.beginPath();
+      ctx.roundRect(-21, -56, 6, 18, 3);
+      ctx.roundRect(15, -56, 6, 18, 3);
+      ctx.fill();
+
+      const packGrad = ctx.createLinearGradient(-15, -68, 15, -34);
+      packGrad.addColorStop(0, "#334155");
+      packGrad.addColorStop(1, "#0f172a");
+      ctx.fillStyle = packGrad;
+      ctx.beginPath();
+      ctx.roundRect(-14, -66, 26, 32, 7);
+      ctx.fill();
+      ctx.strokeStyle = "#475569";
+      ctx.lineWidth = 1.2;
+      ctx.stroke();
+
+      ctx.fillStyle = "#1e293b";
+      ctx.beginPath();
+      ctx.roundRect(-10, -50, 18, 12, 4);
+      ctx.fill();
+      ctx.fillStyle = "#fbbf24";
+      ctx.fillRect(-3, -58, 6, 2.5);
+
+      ctx.fillStyle = "#fdba74";
+      ctx.beginPath();
+      ctx.arc(0, -84, 15, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = "#1c1917";
+      ctx.beginPath();
+      ctx.arc(0, -86, 16, Math.PI * 0.85, Math.PI * 2.15);
+      ctx.lineTo(14, -76);
+      ctx.lineTo(-14, -76);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function getPathPoint(slot, W, H) {
+      const points = [
+        { x: W * 0.25, y: H * 0.86, s: 1.05 },
+        { x: W * 0.42, y: H * 0.74, s: 0.94 },
+        { x: W * 0.49, y: H * 0.62, s: 0.85 },
+        { x: W * 0.47, y: H * 0.50, s: 0.76 },
+        { x: W * 0.53, y: H * 0.39, s: 0.68 },
+        { x: W * 0.63, y: H * 0.29, s: 0.60 },
+        { x: W * 0.75, y: H * 0.19, s: 0.54 }
+      ];
+      const idx = Math.max(0, Math.min(points.length - 1, slot));
+      return points[idx];
+    }
+
+    function renderFantasyScene(time) {
+      const t = time * 0.002;
+      const W = canvas.clientWidth;
+      const H = canvas.clientHeight;
+
+      ctx.clearRect(0, 0, W, H);
+
+      stars.forEach(st => {
+        const tw = 0.45 + Math.sin(t * 2 + st.x * 12) * 0.45;
+        ctx.fillStyle = `rgba(224, 242, 254, ${st.a * tw})`;
+        ctx.beginPath();
+        ctx.arc(st.x * W, st.y * H, st.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.fillStyle = "rgba(56, 189, 248, 0.08)";
+      ctx.beginPath();
+      ctx.arc(W * 0.2, H * 0.48, 95, 0, Math.PI * 2);
+      ctx.arc(W * 0.55, H * 0.42, 120, 0, Math.PI * 2);
+      ctx.arc(W * 0.85, H * 0.52, 110, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawFloatingIsland(W * 0.19, H * 0.29, 0.85, t, false);
+      drawFloatingIsland(W * 0.48, H * 0.17, 0.45, t + 1.2, true);
+      drawFloatingIsland(W * 0.88, H * 0.36, 0.55, t + 2.4, false);
+
+      const castlePos = getPathPoint(6, W, H);
+      drawGoldenCastle(castlePos.x, castlePos.y - 12, t);
+
+      if (jumpAnim < 1) {
+        jumpAnim = Math.min(1, jumpAnim + 0.045);
+      }
+      const smoothStep = visualStep + (targetStep - visualStep) * jumpAnim;
+      if (jumpAnim === 1) visualStep = targetStep;
+
+      const maxWindowStart = TOTAL_QUESTIONS - 5;
+      const windowStart = Math.max(0, Math.min(maxWindowStart, Math.floor(smoothStep)));
+
+      for (let slot = 5; slot >= 0; slot--) {
+        const stepIdx = windowStart + slot;
+        if (stepIdx >= TOTAL_QUESTIONS) continue;
+        const pt = getPathPoint(slot, W, H);
+        const state =
+          stepIdx === targetStep ? "active" : stepIdx < targetStep ? "done" : "locked";
+        drawStoneStep(pt.x, pt.y, pt.s, state, stepIdx + 1, t);
+      }
+
+      drawWoodenSignpost(W * 0.13, H * 0.55);
+
+      const relSlot = Math.max(0, Math.min(6, smoothStep - windowStart));
+      const slotFloor = Math.floor(relSlot);
+      const slotCeil = Math.min(6, Math.ceil(relSlot));
+      const frac = relSlot - slotFloor;
+
+      const pA = getPathPoint(slotFloor, W, H);
+      const pB = getPathPoint(slotCeil, W, H);
+
+      const avX = pA.x + (pB.x - pA.x) * frac;
+      const avY = pA.y + (pB.y - pA.y) * frac - Math.sin(jumpAnim * Math.PI) * 36;
+      const avS = pA.s + (pB.s - pA.s) * frac;
+      const idle = jumpAnim === 1 ? Math.sin(t * 2.4) * 2 : 0;
+
+      drawExplorerBoy(avX, avY - 4, avS, idle);
+
+      requestAnimationFrame(renderFantasyScene);
+    }
+    requestAnimationFrame(renderFantasyScene);
+
+    // =========================================================================
+    // LÓGICA DE PREGUNTAS, PUNTOS Y ENVÍO A GOOGLE SHEETS
+    // =========================================================================
+    const startModal = document.getElementById("start-modal");
+    const nameInput = document.getElementById("student-name-input");
+    const nameError = document.getElementById("name-error");
+    const startGameBtn = document.getElementById("start-game-btn");
+
+    const studentLabel = document.getElementById("student-label");
+    const scoreBadge = document.getElementById("score-badge");
+    const scoreLabel = document.getElementById("score-label");
+    const floatingPoints = document.getElementById("floating-points");
+    const quizCard = document.getElementById("quiz-card");
+    const levelPill = document.getElementById("level-pill");
+    const questionTitle = document.getElementById("question-title");
+    const optionsList = document.getElementById("options-list");
+    const feedbackBanner = document.getElementById("feedback-banner");
+    const feedbackText = document.getElementById("feedback-text");
+    const feedbackPts = document.getElementById("feedback-pts");
+    const errorMsg = document.getElementById("error-msg");
+    const nextBtn = document.getElementById("next-btn");
+
+    const readingTitle1 = document.getElementById("reading-bar-title-1");
+    const readingTitle2 = document.getElementById("reading-bar-title-2");
+    const readingSub2 = document.getElementById("reading-bar-sub-2");
+    const readingTextContent = document.getElementById("reading-text-content");
+    const progressFooter = document.getElementById("progress-footer");
+
+    function toggleReadingBody() {
+      readingTextContent.style.display =
+        readingTextContent.style.display === "none" ? "block" : "none";
+    }
+
+    function animateScoreIncrement(fromVal, toVal) {
+      floatingPoints.classList.remove("show");
+      void floatingPoints.offsetWidth;
+      floatingPoints.classList.add("show");
+
+      scoreBadge.classList.add("bump");
+      let current = fromVal;
+      const timer = setInterval(() => {
+        current += 1;
+        if (current >= toVal) {
+          current = toVal;
+          clearInterval(timer);
+          setTimeout(() => scoreBadge.classList.remove("bump"), 350);
+        }
+        scoreLabel.textContent = `${current} / 100 pts`;
+      }, 45);
+    }
+
+    startGameBtn.addEventListener("click", () => {
+      const val = nameInput.value.trim();
+      if (!val) {
+        nameError.style.display = "block";
+        return;
+      }
+      studentName = val;
+      studentLabel.textContent = studentName;
+      startModal.style.display = "none";
+      loadQuestion(0);
+    });
+
+    function loadQuestion(idx) {
+      const q = QUESTIONS[idx];
+      selectedOpt = null;
+      openAnswerText = "";
+      isEvaluating = false;
+      errorMsg.style.display = "none";
+      feedbackBanner.className = "feedback-banner";
+      quizCard.classList.remove("card-correct", "card-wrong");
+      nextBtn.disabled = false;
+
+      levelPill.textContent = q.badge;
+      questionTitle.innerHTML = `${q.question} <span class="req">*</span>`;
+
+      readingTitle1.textContent = q.title;
+      readingTitle2.textContent = q.title;
+      readingSub2.textContent = q.sub;
+      readingTextContent.textContent = q.text;
+      progressFooter.textContent = `Peldaño ${q.step} de ${TOTAL_QUESTIONS}`;
+
+      optionsList.innerHTML = "";
+
+      if (q.type === "open") {
+        const textarea = document.createElement("textarea");
+        textarea.className = "open-textarea";
+        textarea.placeholder = "Escribe aquí tu respuesta con tus propias palabras...";
+        textarea.addEventListener("input", (e) => {
+          openAnswerText = e.target.value;
+          if (openAnswerText.trim().length > 0) {
+            errorMsg.style.display = "none";
+          }
+        });
+        optionsList.appendChild(textarea);
+      } else {
+        q.options.forEach((opt, i) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "option-item";
+          btn.innerHTML = `
+            <span class="radio-circle"><span class="radio-inner"></span></span>
+            <span>${opt}</span>
+          `;
+          btn.addEventListener("click", () => {
+            if (isEvaluating) return;
+            selectedOpt = i;
+            errorMsg.style.display = "none";
+            document.querySelectorAll(".option-item").forEach((el, k) => {
+              el.classList.toggle("selected", k === i);
+            });
+          });
+          optionsList.appendChild(btn);
+        });
+      }
+    }
+
+    nextBtn.addEventListener("click", () => {
+      if (isEvaluating) return;
+
+      const q = QUESTIONS[currentIdx];
+      const textarea = optionsList.querySelector(".open-textarea");
+
+      if (q.type === "open") {
+        // Lectura directa del DOM para garantizar que siempre tome lo escrito
+        openAnswerText = textarea ? textarea.value.trim() : "";
+        if (openAnswerText.length < 3) {
+          errorMsg.textContent = "Por favor escribe tu respuesta para subir de escalón.";
+          errorMsg.style.display = "block";
+          return;
+        }
+      } else {
+        if (selectedOpt === null) {
+          errorMsg.textContent = "Selecciona una opción para subir de escalón.";
+          errorMsg.style.display = "block";
+          return;
+        }
+      }
+
+      isEvaluating = true;
+      nextBtn.disabled = true;
+
+      let isRight = false;
+      let valorParaSheet = "";
+
+      if (q.type === "open") {
+        if (textarea) textarea.disabled = true;
+        isRight = true;
+        // En preguntas abiertas se envía exactamente el texto del estudiante
+        valorParaSheet = openAnswerText;
+      } else {
+        isRight = selectedOpt === q.correct;
+        const optionButtons = document.querySelectorAll(".option-item");
+        optionButtons.forEach((btn, idx) => {
+          btn.disabled = true;
+          if (idx === selectedOpt) {
+            btn.classList.add(isRight ? "correct-anim" : "wrong-anim");
+          }
+        });
+        // En selección múltiple se envía ✅ o ❌
+        valorParaSheet = isRight ? "✅" : "❌";
+      }
+
+      if (isRight) {
+        const prevScore = score;
+        score += POINTS_PER_QUESTION;
+        quizCard.classList.add("card-correct");
+        feedbackText.textContent = q.type === "open" ? "✅ ¡Respuesta Registrada!" : "✅ ¡Respuesta Correcta!";
+        feedbackPts.textContent = `+${POINTS_PER_QUESTION} PTS ⭐`;
+        feedbackBanner.className = "feedback-banner ok";
+
+        playSound("correct");
+        launchSuccessConfetti();
+        animateScoreIncrement(prevScore, score);
+      } else {
+        quizCard.classList.add("card-wrong");
+        feedbackText.textContent = "❌ Respuesta registrada";
+        feedbackPts.textContent = "+0 PTS";
+        feedbackBanner.className = "feedback-banner fail";
+        playSound("wrong");
+      }
+
+      // Guardamos en la posición exacta del escalón (índice 0 a 19)
+      recordedAnswers[q.step - 1] = {
+        pregunta: q.step,
+        tipo: q.type,
+        valor: valorParaSheet,
+        puntos: isRight ? POINTS_PER_QUESTION : 0
+      };
+
+      setTimeout(() => {
+        if (currentIdx < QUESTIONS.length - 1) {
+          visualStep = currentIdx;
+          currentIdx++;
+          targetStep = currentIdx;
+          jumpAnim = 0;
+          loadQuestion(currentIdx);
+        } else {
+          visualStep = currentIdx;
+          targetStep = TOTAL_QUESTIONS;
+          jumpAnim = 0;
+          finishGame();
+        }
+      }, 1350);
+    });
+
+    async function finishGame() {
+      const endModal = document.getElementById("end-modal");
+      const endStudentName = document.getElementById("end-student-name");
+      const endScore = document.getElementById("end-score");
+      const sheetStatus = document.getElementById("sheet-status");
+
+      endStudentName.textContent = `Estudiante: ${studentName}`;
+      endScore.textContent = `${score} / 100 pts`;
+      endModal.style.display = "flex";
+
+      launchVictoryConfetti();
+
+      const params = new URLSearchParams();
+      params.append("fecha", new Date().toLocaleString("es-CO"));
+      params.append("estudiante", studentName);
+      params.append("puntaje", String(score));
+
+      for (let i = 1; i <= 20; i++) {
+        const item = recordedAnswers[i - 1];
+        const ans = item && item.valor !== undefined && item.valor !== "" ? String(item.valor) : "❌";
+        params.append("p" + i, ans);
+        params.append("r" + i, ans);
+        params.append("pregunta" + i, ans);
+      }
+
+      try {
+        await fetch(GOOGLE_SHEETS_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8"
+          },
+          body: params.toString()
+        });
+        sheetStatus.textContent = "✅ ¡Respuestas y puntaje enviados exitosamente a Google Sheets!";
+      } catch (e) {
+        sheetStatus.textContent = "⚠️ Hubo un inconveniente de conexión al enviar a Google Sheets.";
+      }
+    }
+
+    loadQuestion(0);
+  </script>
+</body>
+</html>
